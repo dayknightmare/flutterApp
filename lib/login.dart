@@ -38,7 +38,6 @@ class _Loginpage extends State<Loginpage>{
 
     @override
     Widget build(BuildContext context) {
-    // TODO: implement build
     return new Container(
         padding: new EdgeInsets.all(32.0),
         child: SingleChildScrollView(

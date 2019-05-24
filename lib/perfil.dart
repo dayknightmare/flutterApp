@@ -34,7 +34,6 @@ class _PerfilPage extends State<PerfilPage> {
 	void getP() async {
 
 		var jsona = {};
-
 		var prefs = await SharedPreferences.getInstance();
 		myId = prefs.getInt('userid') ?? 0;
 		api = prefs.getString("api") ?? '';

@@ -17,7 +17,7 @@ class PerfilPage extends StatefulWidget {
 class _PerfilPage extends State<PerfilPage> {
 
 	int _selectedIndex = 2, myId;
-	String api, ftuser = "http://201.76.95.46/static/img/user.png", capeuser, name = '';
+	String url = "http://201.76.95.46",api, ftuser = "http://201.76.95.46/static/img/user.png", capeuser, name = '';
 	List talks = [];
 
 	void deletePub(idPub,index) async{
@@ -27,7 +27,7 @@ class _PerfilPage extends State<PerfilPage> {
         jsona["user"] = myId;
         jsona["id"] = idPub;
         jsona["api"] = api;
-        await http.post(Uri.encodeFull("http://201.76.95.46:80/workserver/delpub/"),body:json.encode(jsona));
+        await http.post(Uri.encodeFull(url+"/workserver/delpub/"),body:json.encode(jsona));
 		setState(() {});
     }
 
@@ -43,21 +43,21 @@ class _PerfilPage extends State<PerfilPage> {
 		jsona["api"] = api;
 
 
-		var r = await http.post(Uri.encodeFull("http://201.76.95.46:80/workserver/getiProfile/"),body:json.encode(jsona));
+		var r = await http.post(Uri.encodeFull(url+"/workserver/getiProfile/"),body:json.encode(jsona));
 		
 		var resposta = json.decode(r.body);
 		if(resposta['style'][1] == null || resposta['style'][1] == ""){
-			ftuser = "http://201.76.95.46/static/img/user.png";
+			ftuser = url+"/static/img/user.png";
 		}
 		else{
-			ftuser = "http://201.76.95.46:80/media" + resposta['style'][1];
+			ftuser = url+"/media" + resposta['style'][1];
 		}
 
 		if(resposta['style'][0] == null || resposta['style'][0] == ""){
 			capeuser = null;
 		}
 		else{
-			capeuser = "http://201.76.95.46:80/media" + resposta['style'][0];
+			capeuser = url+"/media" + resposta['style'][0];
 		}
 		talks = resposta['talks'];
 		name = resposta['name'];
@@ -167,7 +167,7 @@ class _PerfilPage extends State<PerfilPage> {
 											margin: const EdgeInsets.only(top: 15.0,left: 5.0,right: 5.0),
 											child: Column(
 												children: [
-													talks[index][2] != "" ? Image.network('http://201.76.95.46:80'+talks[index][2]) : Text('',style: new TextStyle(fontSize: 1.0)),
+													talks[index][2] != "" ? Image.network(url+talks[index][2]) : Text('',style: new TextStyle(fontSize: 1.0)),
 													Container(
 														padding: new EdgeInsets.all(10.0),
 														child: Column(

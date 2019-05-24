@@ -26,8 +26,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 
 	bool infor = false;
 
-	String image = "", name, api;
-
+	String image = "", name, api, url = "http://201.76.95.46:80";
 	int _selectedIndex = 0, myId, ids;
 
 	List<Widget> post = new List();
@@ -51,7 +50,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 		jsona["pgc"] = idpub;
 		jsona["api"] = api;
 		print("sdf");
-		await http.post(Uri.encodeFull("http://201.76.95.46:80/workserver/likepub/"),body:json.encode(jsona));
+		await http.post(Uri.encodeFull(url+"/workserver/likepub/"),body:json.encode(jsona));
 	  
 	}
 	void ftGaleria() async {
@@ -65,7 +64,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 			jsona["user"] = myId;
 			jsona["id"] = ids;
 			jsona["api"] = api;
-			var r = await http.post(Uri.encodeFull("http://201.76.95.46:80/workserver/gnp/"),body:json.encode(jsona));
+			var r = await http.post(Uri.encodeFull(url+"/workserver/gnp/"),body:json.encode(jsona));
 			var resposta = json.decode(r.body);
 			if(resposta["resposta"] != "error"){
 			  for(var i in resposta["resposta"]){
@@ -84,13 +83,13 @@ class _HomePageVupy extends State<HomePageVupy>{
 		jsona["user"] = myId;
 		jsona["id"] = idPub;
 		jsona["api"] = api;
-		await http.post(Uri.encodeFull("http://201.76.95.46:80/workserver/delpub/"),body:json.encode(jsona));
+		await http.post(Uri.encodeFull(url+"/workserver/delpub/"),body:json.encode(jsona));
 	}
 
 	Future<String> postPub() async {
 
 		if (image != "" || publ.text != ""){
-			var uri = Uri.parse("http://201.76.95.46:80/workserver/prchat/");
+			var uri = Uri.parse(url+"/workserver/prchat/");
 			var request = new http.MultipartRequest("POST", uri);
 
 			request.fields['name'] = name;
@@ -143,7 +142,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 			jsona["user"] = myId;
 			jsona["api"] = api;
 
-			var r = await http.post(Uri.encodeFull('http://201.76.95.46:80/workserver/getinit/'),body:json.encode(jsona));
+			var r = await http.post(Uri.encodeFull(url+'/workserver/getinit/'),body:json.encode(jsona));
 			var resposta = json.decode(r.body);
 
 			talks.addAll(resposta["resposta"]);
@@ -356,7 +355,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 											child: Column(
 
 												children: [
-													talks[index][2] != "" ? Image.network('http://201.76.95.46:80'+talks[index][2]) : Text('',style: new TextStyle(fontSize: 1.0)),
+													talks[index][2] != "" ? Image.network(url+talks[index][2]) : Text('',style: new TextStyle(fontSize: 1.0)),
 													Container(
 														padding: new EdgeInsets.all(10.0),
 
@@ -375,7 +374,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 																								child: new ClipRRect(
 																									borderRadius: new BorderRadius.circular(50.0),
 																									child: Image.network(
-																										'http://201.76.95.46:80'+talks[index][6],
+																										url+talks[index][6],
 																										height: 40.0,
 																										width: 40.0,
 																									),

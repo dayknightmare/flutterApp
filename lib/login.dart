@@ -16,7 +16,7 @@ class _Loginpage extends State<Loginpage>{
     final userF = TextEditingController();
 
     int iduser;
-    String apicad;
+    String apicad, url = "http://201.76.95.46";
 
     Future<String> login(String url, Map body) async {
 
@@ -87,7 +87,7 @@ class _Loginpage extends State<Loginpage>{
                                         data["user"] = userF.text;
                                         data["pass"] = password.text;
 
-                                        var i = await login('http://201.76.95.46:80/workserver/',data);
+                                        var i = await login(url+'/workserver/',data);
                                         if (i == "ok") {
                                             var prefs = await SharedPreferences.getInstance();
                                             prefs.setInt('userid', iduser);

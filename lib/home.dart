@@ -44,6 +44,13 @@ class _HomePageVupy extends State<HomePageVupy>{
 		image = file.path;
 		setState(() {});
 	}
+	
+	void ftGaleria() async {
+		file = await ImagePicker.pickImage(source: ImageSource.gallery);
+		image = file.path;
+		setState(() {});
+	}
+	
 	void likeMe(int index, int idpub) async {
 		var jsona = {};
 		jsona["user"] = myId;
@@ -51,13 +58,9 @@ class _HomePageVupy extends State<HomePageVupy>{
 		jsona["api"] = api;
 		print("sdf");
 		await http.post(Uri.encodeFull(url+"/workserver/likepub/"),body:json.encode(jsona));
-	  
+
 	}
-	void ftGaleria() async {
-		file = await ImagePicker.pickImage(source: ImageSource.gallery);
-		image = file.path;
-		setState(() {});
-	}
+
 	void gnp() async {
 		var jsona = {};
 		if (myId != null || ids != null){
@@ -72,7 +75,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 				  talks.insert(0,i);
 			  }
 			}
-			setState(() {}); 
+			setState(() {});
 		}
 		gnpTime = new Timer(const Duration(seconds: 2), gnp);
 	}
@@ -169,11 +172,12 @@ class _HomePageVupy extends State<HomePageVupy>{
 
 		return Scaffold(
 			appBar: AppBar(
-				title: new Center(child: Text('Publicações')),
+				title: Text('Publicações'),
 				backgroundColor: white,
+				centerTitle: true,
 				actions: <Widget>[
 					IconButton(
-						icon: Icon(IconData(0xe9cd,fontFamily:'icomoon'),color: Colors.black),
+						icon: Icon(IconData(0xe98f,fontFamily:'icomoon'),color: Colors.black),
 						onPressed: () async {
 							await gnpTime.cancel();
 

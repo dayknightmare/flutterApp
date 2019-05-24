@@ -7,6 +7,7 @@ import 'perfil.dart';
 import 'settings.dart';
 import 'login.dart';
 import 'cadastro.dart';
+import 'perfilfts.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -36,6 +37,9 @@ Route routes(RouteSettings settings) {
 
         case '/vupy':
             return PageTransition(child: HomePageVupy(), type: PageTransitionType.rightToLeftWithFade);
+
+        case '/perfilFt':
+            return PageTransition(child: PerfilFtPage(), type: PageTransitionType.rightToLeftWithFade);
 
         case '/settings':
             return PageTransition(child: Settings(), type: PageTransitionType.leftToRightWithFade);
@@ -91,6 +95,7 @@ class _MyApp extends State<MyApp>{
                             Tab(text: "CADASTRO"),
                         ],
                     ),
+                    centerTitle: true,
                     title: Text('Vupy'),
                     backgroundColor: white,
                 ),

@@ -22,14 +22,14 @@ class _PerfilPage extends State<PerfilPage> {
 
 	void deletePub(idPub,index) async{
 		print(index);
-        talks.removeAt(index);
-        var jsona = {};
-        jsona["user"] = myId;
-        jsona["id"] = idPub;
-        jsona["api"] = api;
-        await http.post(Uri.encodeFull(url+"/workserver/delpub/"),body:json.encode(jsona));
+		talks.removeAt(index);
+		var jsona = {};
+		jsona["user"] = myId;
+		jsona["id"] = idPub;
+		jsona["api"] = api;
+		await http.post(Uri.encodeFull(url+"/workserver/delpub/"),body:json.encode(jsona));
 		setState(() {});
-    }
+	}
 
 	void getP() async {
 
@@ -83,11 +83,12 @@ class _PerfilPage extends State<PerfilPage> {
 			backgroundColor: Colors.white,
 			appBar: AppBar(
 
-				title: new Center(child: Text('Pefil')),
+				title: Text('Pefil'),
+				centerTitle: true,
 				backgroundColor: Colors.white,
 				actions: <Widget>[
 					IconButton(
-						icon: Icon(IconData(0xe9cd,fontFamily:'icomoon'),color: Colors.black),
+						icon: Icon(IconData(0xe98f,fontFamily:'icomoon'),color: Colors.black),
 						onPressed: () async {
 							var prefs = await SharedPreferences.getInstance();
 							prefs.clear();
@@ -95,7 +96,14 @@ class _PerfilPage extends State<PerfilPage> {
 						},
 							
 					),
+					
 				],
+				leading: IconButton(
+					icon: Icon(IconData(0xe95d,fontFamily:'icomoon'),color: Colors.black),
+					onPressed: () async {
+						Navigator.pushNamed(context, "/perfilFt");
+					},
+				),
 			),
 			body: Stack(
 				children: <Widget>[
@@ -248,7 +256,7 @@ class _PerfilPage extends State<PerfilPage> {
 																	),
 																),
 																Divider(
-																	color: Color(0xFFd2d2d2)
+																	color: Color(0x00d2d2d2)
 																),
 															],
 														),

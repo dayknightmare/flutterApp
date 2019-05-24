@@ -21,7 +21,6 @@ dependencies:
   image_picker:
   path: ^1.6.2
   async:
-  validate:
   shared_preferences: ^0.4.3
   page_transition: '^1.1.0'
   flutter:

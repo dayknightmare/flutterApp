@@ -71,6 +71,11 @@ class _PerfilPage extends State<PerfilPage> {
 		lets();
 		super.initState();
 	}
+  @override
+  void dispose() {
+    print("dispose was called");
+    super.dispose();
+  }
 
 	@override
 	Widget build(BuildContext context) {

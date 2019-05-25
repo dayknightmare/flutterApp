@@ -60,6 +60,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.3"
+  image_cropper:
+    dependency: "direct dev"
+    description:
+      path: image_cropper
+      relative: true
+    source: path
+    version: "1.0.1"
   image_picker:
     dependency: "direct main"
     description:

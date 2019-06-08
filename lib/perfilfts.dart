@@ -30,6 +30,7 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 	String cpImage = "", ftImage = "";
 
 	int myId;
+  bool changed = false;
 	String url = "http://201.76.95.46",api, ftuser = "http://201.76.95.46/static/img/user.png", capeuser, name = '';
 
 	
@@ -43,9 +44,10 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 			toolbarWidgetColor: Colors.black,
 		);
 		if (ftFileCrop != null) {
-      		ftFile = ftFileCrop;
+      ftFile = ftFileCrop;
+      changed = true;
 			return "ok";
-    	}
+    }
 		else{
 			return "no";
 		}
@@ -61,9 +63,10 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 			toolbarWidgetColor: Colors.black,
 		);
 		if (ftFileCrop != null) {
-      		cpFile = ftFileCrop;
+      cpFile = ftFileCrop;
+      changed = true;
 			return "ok";
-    	}
+    }
 		else{
 			return "no";
 		}
@@ -249,109 +252,38 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 			}
 			setState(() {});
 		}
-
+    
 		return Scaffold(
 			appBar: AppBar(
 				title: Text("Alterações"),
 				centerTitle: true,
 				backgroundColor: Colors.white,
-				leading: IconButton(
-					icon: Icon(IconData(0xe92f,fontFamily:'icomoon'),color: Colors.black),
-					onPressed: () async {
-						await sendFTs();
-						Navigator.of(context).pushNamed("/perfil");
-					},
-				),
+        actions: <Widget>[
+					IconButton(
+						icon: Icon(IconData(0xea10,fontFamily:'icomoon'),color: Colors.black),
+						onPressed: () async {
+							Navigator.pushNamed(context,'/perfil');
+						},	
+					),
+				],
+				leading: changed == true ?
+          IconButton(
+            icon: Icon(IconData(0xe92f,fontFamily:'icomoon'),color: Colors.black),
+            onPressed: () async {
+              await sendFTs();
+              Navigator.of(context).pushNamed("/perfil");
+            },
+          )
+        :
+          null,
 			),
 			body: SingleChildScrollView(
 				child: Container (
-					padding: EdgeInsets.all(10.0),
 					child: Column(
 						children: <Widget>[
-							Text("Foto de perfil",style: new TextStyle(fontSize: 20.0),),
 							Container(
-								height: 280,
 								width: MediaQuery.of(context).size.width,
-								decoration: ftuser == null ?
-									ftImage == "" ?
-										BoxDecoration(
-											color: Colors.grey[200],
-										)
-									:
-										BoxDecoration(
-											image: DecorationImage(image: FileImage(ftFile),fit: BoxFit.cover),
-										)
-								:
-									BoxDecoration(
-										image:
-										ftImage == "" ?
-											DecorationImage(image: NetworkImage(ftuser),fit: BoxFit.cover)
-										:
-											DecorationImage(image: FileImage(ftFile),fit: BoxFit.cover),
-
-									),
-
-								child: Container(
-									height: 280,
-									width: MediaQuery.of(context).size.width,
-									color: Color(0X41000000),
-									child: Center(
-										child: ButtonTheme(
-											height: 40.0,
-											minWidth: MediaQuery.of(context).size.width/3,
-											child: RaisedButton(
-											onPressed: (){
-												showDialog(
-												context: context,
-												builder: (context) {
-													return AlertDialog(
-													content: SingleChildScrollView(
-														child: Row(
-														mainAxisAlignment: MainAxisAlignment.spaceAround,
-														children: <Widget>[
-															ButtonTheme(
-															child: RaisedButton(
-																onPressed: () {
-																ftGaleria();
-																Navigator.pop(context);
-																},
-																child: Text("Galeria",style: TextStyle(color:Color(0xFFFFFFFF))),
-																color: Color(0XFFE7002A),
-															)
-															),
-															ButtonTheme(
-															child: RaisedButton(
-																onPressed: () {
-																ftCamera();
-																Navigator.pop(context);
-																},
-																child: Text("Camera",style: TextStyle(color:Color(0xFFFFFFFF))),
-																color: Color(0XFFE7002A),
-															)
-															),
-														],
-														),
-													),
-													);
-												},
-												);
-											},
-											child: Text(
-												"Escolher",
-												style: TextStyle(color: Colors.white)
-											),
-											color: Color(0XFFE7002A),
-											),
-										),
-									),
-								),
-							),
-
-							Divider(),
-							Text("Capa de perfil",style: new TextStyle(fontSize: 20.0),),
-							Container(
 								height: 280,
-								width: MediaQuery.of(context).size.width,
 								decoration: capeuser == null ?
 									cpImage == "" ?
 										BoxDecoration(
@@ -365,15 +297,16 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 									BoxDecoration(
 										image:
 											cpImage == "" ?
-												DecorationImage(image: NetworkImage(capeuser),fit: BoxFit.cover)
+												DecorationImage(
+                          image: NetworkImage(capeuser),fit: BoxFit.cover)
 											:
 												DecorationImage(image: FileImage(cpFile),fit: BoxFit.cover),
 									),
 
 								child: Container(
-									height: 280,
-									width: MediaQuery.of(context).size.width,
-									color: Color(0X41000000),
+                  decoration: BoxDecoration(
+                    color: Color(0X41000000),
+                  ),
 									child: Center(
 										child: ButtonTheme(
 											height: 40.0,
@@ -423,6 +356,91 @@ class _PerfilFtPage extends State<PerfilFtPage>{
 											)
 										),
 									)
+								),
+							),
+              Divider(),
+              Container(
+								width: MediaQuery.of(context).size.width / 1.6,
+								height: MediaQuery.of(context).size.width / 1.6,
+								decoration: ftuser == null ?
+									ftImage == "" ?
+										BoxDecoration(
+											color: Colors.grey[200],
+                      border: Border.all(width: 0),
+                      borderRadius: BorderRadius.circular(200),
+										)
+									:
+										BoxDecoration(
+											image: DecorationImage(image: FileImage(ftFile),fit: BoxFit.cover),
+                      border: Border.all(width: 0),
+                      borderRadius: BorderRadius.circular(200),
+										)
+								:
+									BoxDecoration(
+										image:
+										ftImage == "" ?
+											DecorationImage(image: NetworkImage(ftuser),fit: BoxFit.cover)
+										:
+											DecorationImage(image: FileImage(ftFile),fit: BoxFit.cover),
+                    border: Border.all(width: 0),
+                    borderRadius: BorderRadius.circular(200),
+									),
+
+								child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0X41000000),
+                    border: Border.all(width: 0),
+                    borderRadius: BorderRadius.circular(200),
+                  ),
+									child: Center(
+										child: ButtonTheme(
+											height: 40.0,
+											minWidth: MediaQuery.of(context).size.width/3,
+											child: RaisedButton(
+											onPressed: (){
+												showDialog(
+												context: context,
+												builder: (context) {
+													return AlertDialog(
+													content: SingleChildScrollView(
+														child: Row(
+														mainAxisAlignment: MainAxisAlignment.spaceAround,
+														children: <Widget>[
+															ButtonTheme(
+															child: RaisedButton(
+																onPressed: () {
+																ftGaleria();
+																Navigator.pop(context);
+																},
+																child: Text("Galeria",style: TextStyle(color:Color(0xFFFFFFFF))),
+																color: Color(0XFFE7002A),
+															)
+															),
+															ButtonTheme(
+															child: RaisedButton(
+																onPressed: () {
+																ftCamera();
+																Navigator.pop(context);
+																},
+																child: Text("Camera",style: TextStyle(color:Color(0xFFFFFFFF))),
+																color: Color(0XFFE7002A),
+															)
+															),
+														],
+														),
+													),
+													);
+												},
+												);
+											},
+											child: Text(
+												"Escolher",
+												style: TextStyle(color: Colors.white)
+											),
+											color: Color(0XFFE7002A),
+											),
+										),
+									),
 								),
 							),
 						],

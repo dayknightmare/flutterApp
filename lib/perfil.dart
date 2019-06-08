@@ -40,10 +40,7 @@ class _PerfilPage extends State<PerfilPage> {
 
 		jsona["user"] = myId;
 		jsona["api"] = api;
-
-
 		var r = await http.post(Uri.encodeFull(url+"/workserver/getiProfile/"),body:json.encode(jsona));
-		
 		var resposta = json.decode(r.body);
 		if(resposta['style'][1] == null || resposta['style'][1] == ""){
 			ftuser = url+"/static/img/user.png";
@@ -121,7 +118,7 @@ class _PerfilPage extends State<PerfilPage> {
 										child: Column(
 											children: [
 												Container(
-													height: 280.0,
+													height: MediaQuery.of(context).size.width / 1.7777777777777777,
 													width: MediaQuery.of(context).size.width,			
 													decoration: capeuser == null ? BoxDecoration(
 														color: Colors.grey[200],
@@ -130,19 +127,19 @@ class _PerfilPage extends State<PerfilPage> {
 														image: DecorationImage(image: NetworkImage(capeuser),fit: BoxFit.cover),
 														
 													),
-													padding: EdgeInsets.symmetric(vertical: 52.5),
+													padding: EdgeInsets.symmetric(vertical: (MediaQuery.of(context).size.width / 1.7777777777777777 - MediaQuery.of(context).size.width / 2.4)/2),
 													child: Column(
 														children: <Widget>[
 															Container(
-																width: 175,
-																height: 175,
+																width: MediaQuery.of(context).size.width / 2.4,
+																height: MediaQuery.of(context).size.width / 2.4,
 																decoration: BoxDecoration(
 																	border: Border.all(width: 0),
 																	borderRadius: BorderRadius.circular(100)
 																),
 																child: ClipRRect(
 																	borderRadius: BorderRadius.circular(100),
-																	child: Image.network(ftuser,width:175,height: 175),
+																	child: Image.network(ftuser,width:MediaQuery.of(context).size.width / 2.4,height: MediaQuery.of(context).size.width / 2.4),
 																),
 															),
 														],

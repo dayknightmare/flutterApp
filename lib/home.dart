@@ -69,15 +69,24 @@ class _HomePageVupy extends State<HomePageVupy>{
 			jsona["api"] = api;
 			var r = await http.post(Uri.encodeFull(url+"/workserver/gnp/"),body:json.encode(jsona));
 			var resposta = json.decode(r.body);
+      var i;
 			if(resposta["resposta"] != "error"){
-			  for(var i in resposta["resposta"]){
-				  ids = i[0];
-				  talks.insert(0,i);
-			  }
+        if (resposta["resposta"].length > 0) {
+          for(i = 0; i < resposta["resposta"].length; i++){
+            ids = resposta["resposta"][i][0];
+				    talks.insert(0,resposta["resposta"][i]);
+          }
+          if (i+1 >= resposta["resposta"].length) {
+		        gnpTime = new Timer(const Duration(seconds: 2), gnp);
+          }
+        }
+        else{
+          print("0");
+		      gnpTime = new Timer(const Duration(seconds: 2), gnp);
+        }
 			}
 			setState(() {});
 		}
-		gnpTime = new Timer(const Duration(seconds: 2), gnp);
 	}
 
 	void deletePub(idPub,index) async{
@@ -157,7 +166,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 		}
 		focusPubl.addListener(changeFocusPubl);
 		startChatPub();
-		gnp();
+		gnpTime = new Timer(const Duration(seconds: 2), gnp);
 		super.initState();
 
 	}
@@ -561,8 +570,8 @@ class _HomePageVupy extends State<HomePageVupy>{
 												(BuildContext context, int index) {
 													return ButtonTheme(
 														child: RaisedButton(
-															onPressed: ()=>{
-																addEmoji(index)
+															onPressed: (){
+																addEmoji(index);
 															},
 															child: Text(emojis[index]["emoji"]),
 															color: Colors.grey[100],
@@ -578,6 +587,7 @@ class _HomePageVupy extends State<HomePageVupy>{
 						),
 					)
 					: SizedBox(),
+          Divider(color: Colors.white),
 				],
 			),
 			bottomNavigationBar: BottomNavigationBar(

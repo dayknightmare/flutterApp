@@ -80,6 +80,9 @@ class _PerfilPage extends State<PerfilPage> {
 			if(index == 0){
 				Navigator.pushReplacementNamed(context,"/vupy");
 			}
+      if (index == 1) {
+        Navigator.pushReplacementNamed(context, "/chat");
+      }
 		}
 		return Scaffold(
 			backgroundColor: Colors.white,

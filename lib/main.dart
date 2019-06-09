@@ -8,6 +8,7 @@ import 'settings.dart';
 import 'login.dart';
 import 'cadastro.dart';
 import 'perfilfts.dart';
+import 'chat.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -46,6 +47,9 @@ Route routes(RouteSettings settings) {
 
         case '/perfil':
             return PageTransition(child: PerfilPage(), type: PageTransitionType.leftToRightWithFade);
+        
+        case '/chat':
+            return PageTransition(child: ChatVupy(), type: PageTransitionType.leftToRightWithFade);
 
         default:
             return null;

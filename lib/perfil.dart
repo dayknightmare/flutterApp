@@ -9,7 +9,6 @@ const white = const Color(0xFFFFFFFF);
 
 class PerfilPage extends StatefulWidget {
 	PerfilPage({Key key}) : super(key: key);
-
 	@override
 	State createState() => _PerfilPage();
 }

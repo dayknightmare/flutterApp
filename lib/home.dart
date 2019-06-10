@@ -79,7 +79,6 @@ class _HomePageVupy extends State<HomePageVupy> {
             gnpTime = new Timer(const Duration(seconds: 2), gnp);
           }
         } else {
-          print("0");
           gnpTime = new Timer(const Duration(seconds: 2), gnp);
         }
       }
@@ -108,7 +107,6 @@ class _HomePageVupy extends State<HomePageVupy> {
         var stream =
             new http.ByteStream(DelegatingStream.typed(file.openRead()));
         var length = await file.length();
-        print(file.path.split("/").last);
         var multipartFile = new http.MultipartFile('img', stream, length,
             filename: basename(file.path));
         request.files.add(multipartFile);
@@ -370,8 +368,8 @@ class _HomePageVupy extends State<HomePageVupy> {
                         borderRadius: new BorderRadius.circular(5.0),
                         boxShadow: [
                           new BoxShadow(
-                            color: const Color(0x33000000),
-                            blurRadius: 5.0,
+                            color: const Color(0x23000000),
+                            blurRadius: 4.0,
                           )
                         ],
                       ),
@@ -395,13 +393,9 @@ class _HomePageVupy extends State<HomePageVupy> {
                                           children: [
                                             talks[index][6] != ""
                                                 ? Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            right: 5.0),
+                                                    margin:const EdgeInsets.only(right: 5.0),
                                                     child: new ClipRRect(
-                                                      borderRadius:
-                                                          new BorderRadius
-                                                              .circular(50.0),
+                                                      borderRadius: new BorderRadius.circular(50.0),
                                                       child: Image.network(
                                                         url + talks[index][6],
                                                         height: 40.0,

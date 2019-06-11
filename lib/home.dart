@@ -176,7 +176,7 @@ class _HomePageVupy extends State<HomePageVupy> {
         gnpTime.cancel();
         Navigator.pushReplacementNamed(context, "/perfil");
       }
-	  if (index == 1) {
+      if (index == 1) {
         gnpTime.cancel();
         Navigator.pushReplacementNamed(context, "/chat");
       }
@@ -393,9 +393,13 @@ class _HomePageVupy extends State<HomePageVupy> {
                                           children: [
                                             talks[index][6] != ""
                                                 ? Container(
-                                                    margin:const EdgeInsets.only(right: 5.0),
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            right: 5.0),
                                                     child: new ClipRRect(
-                                                      borderRadius: new BorderRadius.circular(50.0),
+                                                      borderRadius:
+                                                          new BorderRadius
+                                                              .circular(50.0),
                                                       child: Image.network(
                                                         url + talks[index][6],
                                                         height: 40.0,

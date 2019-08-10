@@ -30,9 +30,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
 
   int myId;
   bool changed = false;
-  String url = "http://201.76.95.46",
+  String url = "http://179.233.213.76",
       api,
-      ftuser = "http://201.76.95.46/static/img/user.png",
+      ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png",
       capeuser,
       name = '';
 
@@ -96,7 +96,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
     } else {
       capeuser = url + "/media" + resposta['style'][0];
     }
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -171,7 +173,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
           },
         );
       }
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
 
     void ftGaleria() async {
@@ -198,7 +202,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
           },
         );
       }
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
 
     void cpCamera() async {
@@ -225,7 +231,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
           },
         );
       }
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
 
     void cpGaleria() async {
@@ -252,7 +260,9 @@ class _PerfilFtPage extends State<PerfilFtPage> {
           },
         );
       }
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
 
     return Scaffold(
@@ -352,7 +362,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                                 },
                               );
                             },
-                            child: Text("Escolher",
+                            child: Text("Trocar",
                                 style: TextStyle(color: Colors.white)),
                             color: Color(0XFFE7002A),
                           )),
@@ -434,7 +444,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                             },
                           );
                         },
-                        child: Text("Escolher",
+                        child: Text("Trocar",
                             style: TextStyle(color: Colors.white)),
                         color: Color(0XFFE7002A),
                       ),

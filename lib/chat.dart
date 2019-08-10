@@ -15,7 +15,7 @@ class ChatVupy extends StatefulWidget {
 
 class _ChatVupy extends State<ChatVupy> {
   int _selectedIndex = 1, myId, ids;
-  String api, url = "http://201.76.95.46";
+  String api, url = "http://179.233.213.76";
   List friends = [];
 
   void getP() async {
@@ -61,7 +61,7 @@ class _ChatVupy extends State<ChatVupy> {
         backgroundColor: Colors.white,
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0Xffffffff),
       body: Stack(
         children: <Widget>[
           CustomScrollView(

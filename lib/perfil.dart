@@ -15,9 +15,9 @@ class PerfilPage extends StatefulWidget {
 
 class _PerfilPage extends State<PerfilPage> {
   int _selectedIndex = 2, myId;
-  String url = "http://201.76.95.46",
+  String url = "http://179.233.213.76",
       api,
-      ftuser = "http://201.76.95.46/static/img/user.png",
+      ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png",
       capeuser,
       name = '';
   List talks = [];
@@ -89,7 +89,7 @@ class _PerfilPage extends State<PerfilPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0Xffe6ecf0),
       appBar: AppBar(
         title: Text('Pefil'),
         centerTitle: true,
@@ -162,13 +162,20 @@ class _PerfilPage extends State<PerfilPage> {
                             ],
                           ),
                         ),
-                        Divider(color: Colors.white),
-                        Text(name,
-                            style: new TextStyle(
+                        Container(
+                          height: 75,
+                          padding: EdgeInsets.only(top: 20),
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.white,
+                          child: Text(name,style: new TextStyle(
                               fontSize: 25.0,
-                            )),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        
                         Divider(
-                          color: Colors.grey[100],
+                          color: Color(0Xffe6ecf0),
                         ),
                       ],
                     ),
@@ -188,13 +195,13 @@ class _PerfilPage extends State<PerfilPage> {
                         borderRadius: new BorderRadius.circular(5.0),
                         boxShadow: [
                           new BoxShadow(
-                            color: const Color(0x33000000),
+                            color: const Color(0x22000000),
                             blurRadius: 5.0,
                           )
                         ],
                       ),
                       margin: const EdgeInsets.only(
-                          top: 15.0, left: 5.0, right: 5.0),
+                          top: 10.0),
                       child: Column(
                         children: [
                           talks[index][2] != ""

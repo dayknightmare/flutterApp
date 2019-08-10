@@ -30,11 +30,13 @@ class _Createpage extends State<Createpage> {
 
     var r = await http.post(Uri.encodeFull(url), body: json.encode(jsona));
     var resposta = json.decode(r.body);
+
     if (resposta["resposta"][0] == "ok") {
       iduser = resposta["resposta"][1];
       apicad = resposta['resposta'][2];
       return "ok";
-    } else {
+    }
+    else {
       print(resposta['resposta']);
       List<Widget> errors = new List<Widget>();
       for (var i in resposta['resposta']) {
@@ -54,6 +56,7 @@ class _Createpage extends State<Createpage> {
       );
       return "no";
     }
+
   }
 
   @override
@@ -133,7 +136,7 @@ class _Createpage extends State<Createpage> {
                           data['email'] = email.text;
 
                           var i = await cadastro(
-                              'http://201.76.95.46:80/workserver/signup/',
+                              'http://179.233.213.76/workserver/signup/',
                               data);
                           if (i == "ok") {
                             var prefs = await SharedPreferences.getInstance();

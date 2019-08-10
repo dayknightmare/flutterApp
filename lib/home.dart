@@ -1,3 +1,6 @@
+import 'dart:core' as prefix0;
+import 'dart:core';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -19,17 +22,20 @@ class HomePageVupy extends StatefulWidget {
   State createState() => _HomePageVupy();
 }
 
-class _HomePageVupy extends State<HomePageVupy> {
+class _HomePageVupy extends State<HomePageVupy>{
   var _visible = false, gnpTime;
 
   bool infor = false;
 
-  String image = "", name, api, url = "http://201.76.95.46:80";
+  String image = "", name, api, url = "http://179.233.213.76", filter;
   int _selectedIndex = 0, myId, ids;
 
   List<Widget> post = new List();
   List talks = [];
   List emojis = [];
+  List duoemojis = [];
+
+  TextEditingController emojicon = new TextEditingController();
 
   final publ = TextEditingController();
 
@@ -40,13 +46,17 @@ class _HomePageVupy extends State<HomePageVupy> {
   void ftCamera() async {
     file = await ImagePicker.pickImage(source: ImageSource.camera);
     image = file.path;
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   void ftGaleria() async {
     file = await ImagePicker.pickImage(source: ImageSource.gallery);
     image = file.path;
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   void likeMe(int index, int idpub) async {
@@ -54,9 +64,11 @@ class _HomePageVupy extends State<HomePageVupy> {
     jsona["user"] = myId;
     jsona["pgc"] = idpub;
     jsona["api"] = api;
-    print("sdf");
     await http.post(Uri.encodeFull(url + "/workserver/likepub/"),
         body: json.encode(jsona));
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   void gnp() async {
@@ -78,11 +90,13 @@ class _HomePageVupy extends State<HomePageVupy> {
           if (i + 1 >= resposta["resposta"].length) {
             gnpTime = new Timer(const Duration(seconds: 2), gnp);
           }
+          if (this.mounted) {
+            setState(() {});
+          }
         } else {
           gnpTime = new Timer(const Duration(seconds: 2), gnp);
         }
       }
-      setState(() {});
     }
   }
 
@@ -130,7 +144,9 @@ class _HomePageVupy extends State<HomePageVupy> {
   void changeFocusPubl() {
     if (focusPubl.hasFocus.toString() == "true") {
       _visible = false;
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -142,7 +158,6 @@ class _HomePageVupy extends State<HomePageVupy> {
   void initState() {
     void startChatPub() async {
       var jsona = {};
-
       var prefs = await SharedPreferences.getInstance();
       myId = prefs.getInt('userid') ?? 0;
       api = prefs.getString("api") ?? '';
@@ -158,15 +173,47 @@ class _HomePageVupy extends State<HomePageVupy> {
       ids = resposta["lsd"];
       name = resposta['name'];
 
-      emojis =
+      duoemojis =
           json.decode(await rootBundle.loadString('assets/json/finish.json'));
-      setState(() {});
+
+      emojis.addAll(duoemojis);
+      if (this.mounted) {
+        setState(() {});
+      }
     }
 
     focusPubl.addListener(changeFocusPubl);
     startChatPub();
     gnpTime = new Timer(const Duration(seconds: 2), gnp);
+    emojicon.addListener(() {
+      filter = emojicon.text;
+      setState(() {
+        emojis.clear();
+
+        if (filter != null || filter != "") {
+          for(var i = 0; i < duoemojis.length; i++){
+            if (duoemojis[i]['name'].contains(filter)) {
+              emojis.add(duoemojis[i]);
+            }
+          }
+        }
+        else{
+          emojis.addAll(duoemojis);
+        }
+      });
+    });
     super.initState();
+  }
+
+  Future<bool> will() async{
+    if(_visible){
+      _visible = false;
+      setState(() {
+        
+      });
+      return new Future.value(false);
+    }
+    return new Future.value(true);
   }
 
   @override
@@ -201,7 +248,7 @@ class _HomePageVupy extends State<HomePageVupy> {
           ),
         ],
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0Xffe6ecf0),
       body: Stack(
         // padding: new EdgeInsets.only(bottom:10.0),
         children: [
@@ -212,8 +259,9 @@ class _HomePageVupy extends State<HomePageVupy> {
                 delegate: SliverChildListDelegate(
                   [
                     Container(
-                      padding: new EdgeInsets.symmetric(horizontal: 10.0),
-                      margin: const EdgeInsets.only(top: 15.0),
+                      padding: new EdgeInsets.symmetric(horizontal: 10.0,vertical: 15),
+                      
+                      color: white,
                       child: Column(
                         children: [
                           image != ""
@@ -241,110 +289,123 @@ class _HomePageVupy extends State<HomePageVupy> {
                                 height: 1.0,
                               )),
                           Container(
+
                             margin: const EdgeInsets.only(top: 15.0),
                             child: Row(
                               children: [
                                 Expanded(
                                   flex: 1,
                                   child: Row(children: [
+                                    
                                     Container(
                                       margin: const EdgeInsets.only(right: 5.0),
-                                      child: ButtonTheme(
-                                          height: 40.0,
-                                          minWidth: 0.0,
-                                          child: RaisedButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    content:
-                                                        SingleChildScrollView(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceAround,
-                                                        children: <Widget>[
-                                                          ButtonTheme(
-                                                              child:
-                                                                  RaisedButton(
-                                                            onPressed: () {
-                                                              ftGaleria();
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Text(
-                                                                "Galeria",
-                                                                style: TextStyle(
-                                                                    color: Color(
-                                                                        0xFFFFFFFF))),
-                                                            color: vupycolor,
-                                                          )),
-                                                          ButtonTheme(
-                                                              child:
-                                                                  RaisedButton(
-                                                            onPressed: () {
-                                                              ftCamera();
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Text(
-                                                                "Camera",
-                                                                style: TextStyle(
-                                                                    color: Color(
-                                                                        0xFFFFFFFF))),
-                                                            color: vupycolor,
-                                                          )),
-                                                        ],
+                                      height: 40.0,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 0,
+                                          color: white
+                                        ),
+                                        borderRadius: BorderRadius.circular(100),
+                                        color: vupycolor,
+                                      ),
+                                      child: IconButton(
+                                        padding: new EdgeInsets.all(0.0),
+                                        icon: Icon(
+                                          IconData(0xe92b,fontFamily: "icomoon"),
+                                          size: 20.0,
+                                          color: Colors.white
+                                        ),
+                                        onPressed: (){
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                content: SingleChildScrollView(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: <Widget>[
+                                                      MaterialButton(
+                                                        onPressed: (){
+                                                          ftGaleria();
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text("Galeria"),
+                                                        color: vupycolor,
+                                                        textColor: white,
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                      MaterialButton(
+                                                        onPressed: (){
+                                                          ftCamera();
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text("Camera"),
+                                                        color: vupycolor,
+                                                        textColor: white,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
                                               );
                                             },
-                                            child: Icon(
-                                                IconData(0xe92b,
-                                                    fontFamily: "icomoon"),
-                                                size: 20.0,
-                                                color: Colors.white),
-                                            color: vupycolor,
-                                          )),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                    ButtonTheme(
-                                        height: 40.0,
-                                        minWidth: 0.0,
-                                        child: RaisedButton(
-                                          onPressed: () {
-                                            if (_visible) {
-                                              _visible = false;
-                                            } else {
-                                              focusPubl.unfocus();
-                                              _visible = true;
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 0,
+                                          color: white
+                                        ),
+                                        borderRadius: BorderRadius.circular(100),
+                                        color: vupycolor,
+                                      ),
+                                      child: IconButton(
+                                        icon: Icon(IconData(0xe9dc,fontFamily: "icomoon"),
+                                          size: 20.0,
+                                          color: Colors.white
+                                        ),
+                                        onPressed: () {
+                                          if (_visible) {
+                                            _visible = false;
+                                            if (this.mounted) {
+                                              setState(() {
+                                                
+                                              });
                                             }
-                                          },
-                                          child: Icon(
-                                              IconData(0xe9dc,
-                                                  fontFamily: "icomoon"),
-                                              size: 20.0,
-                                              color: Colors.white),
-                                          color: vupycolor,
-                                        )),
-                                  ]),
+                                          }
+                                          else {
+                                            focusPubl.unfocus();
+                                            _visible = true;
+                                            if (this.mounted) {
+                                              setState(() {
+                                                
+                                              });
+                                            }
+                                          }
+                                        },
+                                      ),
+                                    )
+                                    ]
+                                  ),
                                 ),
                                 Expanded(
                                   flex: 1,
-                                  child: ButtonTheme(
-                                      height: 40.0,
-                                      minWidth: 0.0,
-                                      child: RaisedButton(
-                                        onPressed: () {
-                                          postPub();
-                                        },
-                                        child: Text("Publicar",
-                                            style:
-                                                TextStyle(color: Colors.white)),
-                                        color: vupycolor,
-                                      )),
+                                  child: MaterialButton(
+                                    height: 40.0,
+                                    
+                                    child: Text("Publicar"),
+                                    onPressed: () {
+                                      postPub();
+                                    },
+                                    textColor: white,
+                                    color: vupycolor,
+                                  )
                                 ),
                               ],
                             ),
@@ -374,7 +435,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                         ],
                       ),
                       margin: const EdgeInsets.only(
-                          top: 15.0, left: 5.0, right: 5.0),
+                          top: 10.0),
                       child: Column(
                         children: [
                           talks[index][2] != ""
@@ -427,18 +488,13 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                       content:
                                                           SingleChildScrollView(
                                                         child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceAround,
+                                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                           children: <Widget>[
                                                             ButtonTheme(
                                                                 child:
                                                                     RaisedButton(
                                                               onPressed: () {
-                                                                deletePub(
-                                                                    talks[index]
-                                                                        [0],
-                                                                    index);
+                                                                deletePub(talks[index][0],index);
                                                                 Navigator.pop(
                                                                     context);
                                                               },
@@ -516,22 +572,31 @@ class _HomePageVupy extends State<HomePageVupy> {
                                 Container(
                                   child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceAround,
+
                                       children: [
                                         talks[index][7] == 0
-                                            ? GestureDetector(
-                                                onTap: () async {
-                                                  talks[index][7] = 1;
-                                                  likeMe(
-                                                      index, talks[index][0]);
-                                                },
-                                                child: Icon(
-                                                    IconData(0xe97c,
-                                                        fontFamily: 'icomoon'),
-                                                    size: 20))
+                                          ? GestureDetector(
+                                              onTap: () async {
+                                                talks[index][7] = 1;
+                                                likeMe(
+                                                  index,
+                                                  talks[index][0]
+                                                );
+                                              },
+                                              child: Icon(
+                                                IconData(0xe97c,
+                                                  fontFamily: 'icomoon'),
+                                                  size: 20
+                                                )
+                                            )
                                             : GestureDetector(
                                                 onTap: () async {
                                                   talks[index][7] = 0;
+                                                  likeMe(
+                                                  index,
+                                                  talks[index][0]
+                                                );
                                                 },
                                                 child: new IconTheme(
                                                   data: new IconThemeData(
@@ -569,9 +634,7 @@ class _HomePageVupy extends State<HomePageVupy> {
               ? Positioned(
                   bottom: 0,
                   child: WillPopScope(
-                    onWillPop: () async {
-                      _visible = false;
-                    },
+                    onWillPop: will,
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 250.0,
@@ -589,35 +652,70 @@ class _HomePageVupy extends State<HomePageVupy> {
                           )
                         ],
                       ),
-                      child: CustomScrollView(
-                        semanticChildCount: emojis.length,
-                        slivers: <Widget>[
-                          SliverGrid(
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 50.0,
-                              mainAxisSpacing: 4.0,
-                              crossAxisSpacing: 4.0,
-                              childAspectRatio: 1.0,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            height: 50,
+                            width: MediaQuery.of(context).size.width,
+                            child: TextField( 
+                              controller: emojicon,
+                              decoration: new InputDecoration(
+                                hintText: 'Digite aqui...',
+                                enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                  BorderSide(color: Colors.grey, width: 1.0),
+                                ),
+                              ),
                             ),
-                            delegate: SliverChildBuilderDelegate(
-                              (BuildContext context, int index) {
-                                return ButtonTheme(
-                                    child: RaisedButton(
-                                  onPressed: () {
-                                    addEmoji(index);
-                                  },
-                                  child: Text(emojis[index]["emoji"]),
-                                  color: Colors.white,
-                                ));
-                              },
-                              childCount: emojis.length,
+                          ),
+                          Container(
+                            height: 200,
+                            width: MediaQuery.of(context).size.width,
+                            
+                            child:                      
+                            CustomScrollView(
+                              semanticChildCount: emojis.length,
+                              slivers: <Widget>[
+                                SliverGrid(
+                                  gridDelegate:
+                                      SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 50.0,
+                                    mainAxisSpacing: 4.0,
+                                    crossAxisSpacing: 4.0,
+                                    childAspectRatio: 1.0,
+                                  ),
+                                  delegate: SliverChildBuilderDelegate(
+                                    (BuildContext context, int index) {
+                                      return filter == null || filter == "" ?
+                                        MaterialButton(
+                                          child: Text(emojis[index]["emoji"]),
+                                          onPressed: () {
+                                            addEmoji(index);
+                                          },
+                                        )
+                                      :
+                                        emojis[index]['name'].contains(filter) ?
+                                          MaterialButton(
+                                            child: Text(emojis[index]["emoji"]),
+                                            onPressed: () {
+                                              addEmoji(index);
+                                            },
+                                          )
+                                        :
+                                          Container();
+                                    },
+                                    childCount: emojis.length,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                  )
+                  
+                  
                 )
               : SizedBox(),
           Divider(color: Colors.white),

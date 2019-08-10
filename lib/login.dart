@@ -16,7 +16,7 @@ class _Loginpage extends State<Loginpage> {
   final userF = TextEditingController();
 
   int iduser;
-  String apicad, url = "http://201.76.95.46";
+  String apicad, url = "http://179.233.213.76";
 
   Future<String> login(String url, Map body) async {
     var jsona = {};

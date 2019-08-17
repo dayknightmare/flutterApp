@@ -40,7 +40,6 @@ class _ChatVupy extends State<ChatVupy> {
 
   @override
   void dispose() {
-    print("chat dispose was called");
     super.dispose();
   }
 
@@ -78,7 +77,7 @@ class _ChatVupy extends State<ChatVupy> {
                         ),
                         title: Text(friends[index][1]),
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PrivateChatVupy(

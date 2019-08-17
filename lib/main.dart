@@ -10,6 +10,7 @@ import 'cadastro.dart';
 import 'perfilfts.dart';
 import 'chat.dart';
 import 'privateChat.dart';
+import 'comments.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -51,9 +52,14 @@ Route routes(RouteSettings settings) {
     case '/chat':
       return PageTransition(
           child: ChatVupy(), type: PageTransitionType.leftToRightWithFade);
+
     case '/privatechat':
       return PageTransition(
           child: PrivateChatVupy(), type: PageTransitionType.downToUp);
+
+    case '/comments':
+      return PageTransition(
+          child: Comments(), type: PageTransitionType.downToUp);
 
     default:
       return null;

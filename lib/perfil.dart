@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 
 import 'dart:convert';
 
+import 'package:vupy/widgets/postCard.dart';
+
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
 
@@ -21,18 +23,6 @@ class _PerfilPage extends State<PerfilPage> {
       capeuser,
       name = '';
   List talks = [];
-
-  void deletePub(idPub, index) async {
-    print(index);
-    talks.removeAt(index);
-    var jsona = {};
-    jsona["user"] = myId;
-    jsona["id"] = idPub;
-    jsona["api"] = api;
-    await http.post(Uri.encodeFull(url + "/workserver/delpub/"),
-        body: json.encode(jsona));
-    setState(() {});
-  }
 
   void getP() async {
     var jsona = {};
@@ -73,7 +63,6 @@ class _PerfilPage extends State<PerfilPage> {
 
   @override
   void dispose() {
-    print("dispose was called");
     super.dispose();
   }
 
@@ -167,13 +156,14 @@ class _PerfilPage extends State<PerfilPage> {
                           padding: EdgeInsets.only(top: 20),
                           width: MediaQuery.of(context).size.width,
                           color: Colors.white,
-                          child: Text(name,style: new TextStyle(
+                          child: Text(
+                            name,
+                            style: new TextStyle(
                               fontSize: 25.0,
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        
                         Divider(
                           color: Color(0Xffe6ecf0),
                         ),
@@ -185,137 +175,13 @@ class _PerfilPage extends State<PerfilPage> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return Container(
-                      decoration: new BoxDecoration(
-                        color: Colors.white,
-                        border: new Border.all(
-                          width: 0.0,
-                          color: const Color(0x00000000),
-                        ),
-                        borderRadius: new BorderRadius.circular(5.0),
-                        boxShadow: [
-                          new BoxShadow(
-                            color: const Color(0x22000000),
-                            blurRadius: 5.0,
-                          )
-                        ],
-                      ),
-                      margin: const EdgeInsets.only(
-                          top: 10.0),
-                      child: Column(
-                        children: [
-                          talks[index][2] != ""
-                              ? Image.network(url + talks[index][2])
-                              : Text('', style: new TextStyle(fontSize: 1.0)),
-                          Container(
-                            padding: new EdgeInsets.all(10.0),
-                            child: Column(
-                              children: [
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                margin: const EdgeInsets.only(
-                                                    left: 0.0),
-                                                child: Text(talks[index][4]),
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                          'Você deseja remover essa publicação.'),
-                                                      content:
-                                                          SingleChildScrollView(
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceAround,
-                                                          children: <Widget>[
-                                                            ButtonTheme(
-                                                                child:
-                                                                    RaisedButton(
-                                                              onPressed: () {
-                                                                deletePub(
-                                                                    talks[index]
-                                                                        [0],
-                                                                    index);
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Text("Sim",
-                                                                  style: TextStyle(
-                                                                      color: Color(
-                                                                          0xFFFFFFFF))),
-                                                              color: vupycolor,
-                                                            )),
-                                                            ButtonTheme(
-                                                                child:
-                                                                    RaisedButton(
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Text("Não",
-                                                                  style: TextStyle(
-                                                                      color: Color(
-                                                                          0xFFFFFFFF))),
-                                                              color: vupycolor,
-                                                            )),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              child: Container(
-                                                padding:
-                                                    new EdgeInsets.all(5.0),
-                                                margin: const EdgeInsets.only(
-                                                    right: 5.0),
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: Text("X"),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Divider(color: Color(0x00FFFFFF)),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 8.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: talks[index][3] != ""
-                                        ? Text(talks[index][3])
-                                        : Text('',
-                                            style:
-                                                new TextStyle(fontSize: 1.0)),
-                                  ),
-                                ),
-                                Divider(color: Color(0x00d2d2d2)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    return new PostCard(
+                      talks: talks[index],
+                      index: index,
+                      myId: myId,
+                      api: api,
+                      name: name,
+                      returnPage: "/perfil",
                     );
                   },
                   childCount: talks.length,

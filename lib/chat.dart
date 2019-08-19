@@ -110,6 +110,8 @@ class _ChatVupy extends State<ChatVupy> {
               title: Text('Perfil')),
           // BottomNavigationBarItem(icon: Icon(IconData(0xe9cd,fontFamily:'icomoon')), title: Text('Configurações')),
         ],
+        backgroundColor: Color(0xffffffff),
+
         currentIndex: _selectedIndex,
         fixedColor: vupycolor,
         onTap: _onItemTapped,

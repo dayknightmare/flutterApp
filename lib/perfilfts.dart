@@ -275,7 +275,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
             icon: Icon(IconData(0xea10, fontFamily: 'icomoon'),
                 color: Colors.black),
             onPressed: () async {
-              Navigator.pushNamed(context, '/perfil');
+              Navigator.pushNamed(context, '/bottom');
             },
           ),
         ],
@@ -285,7 +285,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                     color: Colors.black),
                 onPressed: () async {
                   await sendFTs();
-                  Navigator.of(context).pushNamed("/perfil");
+                  Navigator.of(context).pushNamed("/bottom");
                 },
               )
             : null,
@@ -319,56 +319,58 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                       color: Color(0X41000000),
                     ),
                     child: Center(
-                      child: ButtonTheme(
-                          height: 40.0,
-                          minWidth: MediaQuery.of(context).size.width / 3,
-                          child: RaisedButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    content: SingleChildScrollView(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: <Widget>[
-                                          ButtonTheme(
-                                              child: RaisedButton(
-                                            onPressed: () {
-                                              cpGaleria();
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text("Galeria",
-                                                style: TextStyle(
-                                                    color: Color(0xFFFFFFFF))),
-                                            color: Color(0XFFE7002A),
-                                          )),
-                                          ButtonTheme(
-                                              child: RaisedButton(
-                                            onPressed: () {
-                                              cpCamera();
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text("Camera",
-                                                style: TextStyle(
-                                                    color: Color(0xFFFFFFFF))),
-                                            color: Color(0XFFE7002A),
-                                          )),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        child: Text("Trocar",
+                            style: TextStyle(color: Colors.white)),
+                        color: Color(0xffe7002a),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: SingleChildScrollView(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      ButtonTheme(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          child: RaisedButton(
+                                        onPressed: () {
+                                          cpGaleria();
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Galeria",
+                                            style: TextStyle(
+                                                color: Color(0xFFFFFFFF))),
+                                        color: Color(0XFFE7002A),
+                                      )),
+                                      ButtonTheme(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          child: RaisedButton(
+                                        onPressed: () {
+                                          cpCamera();
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Camera",
+                                            style: TextStyle(
+                                                color: Color(0xFFFFFFFF))),
+                                        color: Color(0XFFE7002A),
+                                      )),
+                                    ],
+                                  ),
+                                ),
                               );
                             },
-                            child: Text("Trocar",
-                                style: TextStyle(color: Colors.white)),
-                            color: Color(0XFFE7002A),
-                          )),
+                          );
+                        },
+                      ),
                     )),
               ),
-              Divider(),
+              Divider(
+                color: Colors.white,
+              ),
               Container(
                 width: MediaQuery.of(context).size.width / 1.6,
                 height: MediaQuery.of(context).size.width / 1.6,
@@ -391,65 +393,63 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                                 image: NetworkImage(ftuser), fit: BoxFit.cover)
                             : DecorationImage(
                                 image: FileImage(ftFile), fit: BoxFit.cover),
-                        border: Border.all(width: 0),
+                        border: Border.all(width: 0, color: Color(0x01000001)),
                         borderRadius: BorderRadius.circular(200),
                       ),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Color(0X41000000),
-                    border: Border.all(width: 0),
                     borderRadius: BorderRadius.circular(200),
+                    border: Border.all(width: 0, color: Color(0x01000001)),
                   ),
                   child: Center(
-                    child: ButtonTheme(
-                      height: 40.0,
-                      minWidth: MediaQuery.of(context).size.width / 3,
-                      child: RaisedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                content: SingleChildScrollView(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: <Widget>[
-                                      ButtonTheme(
-                                          child: RaisedButton(
-                                        onPressed: () {
-                                          ftGaleria();
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text("Galeria",
-                                            style: TextStyle(
-                                                color: Color(0xFFFFFFFF))),
-                                        color: Color(0XFFE7002A),
-                                      )),
-                                      ButtonTheme(
-                                          child: RaisedButton(
-                                        onPressed: () {
-                                          ftCamera();
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text("Camera",
-                                            style: TextStyle(
-                                                color: Color(0xFFFFFFFF))),
-                                        color: Color(0XFFE7002A),
-                                      )),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    child:
+                        Text("Trocar", style: TextStyle(color: Colors.white)),
+                    color: Color(0XFFE7002A),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: SingleChildScrollView(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  ButtonTheme(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      child: RaisedButton(
+                                    onPressed: () {
+                                      ftGaleria();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Galeria",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFFFFF))),
+                                    color: Color(0XFFE7002A),
+                                  )),
+                                  ButtonTheme(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      child: RaisedButton(
+                                    onPressed: () {
+                                      ftCamera();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Camera",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFFFFF))),
+                                    color: Color(0XFFE7002A),
+                                  )),
+                                ],
+                              ),
+                            ),
                           );
                         },
-                        child: Text("Trocar",
-                            style: TextStyle(color: Colors.white)),
-                        color: Color(0XFFE7002A),
-                      ),
-                    ),
-                  ),
+                      );
+                    },
+                  )),
                 ),
               ),
             ],

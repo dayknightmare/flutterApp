@@ -14,7 +14,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
-import 'widgets/postCard.dart';
+import 'comments.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -44,6 +44,34 @@ class _HomePageVupy extends State<HomePageVupy> {
   File file;
 
   FocusNode focusPubl = new FocusNode();
+
+  void likeMe(int index, int idpub) async {
+    var jsona = {};
+    jsona["user"] = myId;
+    jsona["pgc"] = idpub;
+    jsona["api"] = api;
+    await http.post(Uri.encodeFull(url + "/workserver/likepub/"),
+        body: json.encode(jsona));
+    if (this.mounted) {
+      setState(() {});
+    }
+  }
+
+  void deletePub(idPub, index) async {
+    var jsona = {};
+    talks.removeAt(index);
+    // deleted = 1;
+
+    jsona["user"] = myId;
+    jsona["id"] = idPub;
+    jsona["api"] = api;
+    await http.post(Uri.encodeFull(url + "/workserver/delpub/"),
+        body: json.encode(jsona));
+
+    if (this.mounted) {
+      setState(() {});
+    }
+  }
 
   void ftCamera() async {
     file = await ImagePicker.pickImage(source: ImageSource.camera);
@@ -82,15 +110,13 @@ class _HomePageVupy extends State<HomePageVupy> {
               gnpTime = new Timer(const Duration(seconds: 2), gnp);
             }
           }
-          if (this.mounted) {
-            setState(() {});
-          }
         } else {
           if (fail == false) {
             gnpTime = new Timer(const Duration(seconds: 2), gnp);
           }
         }
       }
+      setState(() {});
     }
   }
 
@@ -120,6 +146,11 @@ class _HomePageVupy extends State<HomePageVupy> {
 
       var response = await request.send();
       print(response.statusCode);
+      if (response.statusCode == 200) {
+        if (this.mounted) {
+          setState(() {});
+        }
+      }
       return "ok";
     }
     return "error";
@@ -142,7 +173,6 @@ class _HomePageVupy extends State<HomePageVupy> {
   void dispose() {
     gnpTime = null;
     fail = true;
-    print("object");
     super.dispose();
   }
 
@@ -205,6 +235,204 @@ class _HomePageVupy extends State<HomePageVupy> {
     return new Future.value(true);
   }
 
+  Widget postCard(
+    talks,
+    index,
+    context,
+  ) {
+    return Container(
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        border: new Border.all(
+          width: 0.0,
+          color: const Color(0x00000000),
+        ),
+        borderRadius: new BorderRadius.circular(5.0),
+        boxShadow: [
+          new BoxShadow(
+            color: const Color(0x23000000),
+            blurRadius: 4.0,
+          )
+        ],
+      ),
+      margin: const EdgeInsets.only(top: 10.0),
+      child: Column(
+        children: [
+          talks[2] != ""
+              ? Image.network(url + talks[2])
+              : Text('', style: new TextStyle(fontSize: 1.0)),
+          Container(
+            padding: new EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Container(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: [
+                            talks[6] != ""
+                                ? Container(
+                                    margin: const EdgeInsets.only(right: 5.0),
+                                    child: new ClipRRect(
+                                      borderRadius:
+                                          new BorderRadius.circular(50.0),
+                                      child: Image.network(
+                                        url + talks[6],
+                                        height: 40.0,
+                                        width: 40.0,
+                                      ),
+                                    ))
+                                : Text(''),
+                            Text(talks[5],
+                                style: new TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
+                                )),
+                          ],
+                        ),
+                      ),
+                      talks[1] == myId
+                          ? GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          'Você deseja remover essa publicação.'),
+                                      content: SingleChildScrollView(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            ButtonTheme(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                child: RaisedButton(
+                                              onPressed: () {
+                                                deletePub(talks[0], index);
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text("Sim",
+                                                  style: TextStyle(
+                                                      color:
+                                                          Color(0xFFFFFFFF))),
+                                              color: vupycolor,
+                                            )),
+                                            ButtonTheme(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+
+                                                child: RaisedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text("Não",
+                                                  style: TextStyle(
+                                                      color:
+                                                          Color(0xFFFFFFFF))),
+                                              color: vupycolor,
+                                            )),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: new EdgeInsets.all(5.0),
+                                margin: const EdgeInsets.only(right: 5.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text("X"),
+                                ),
+                              ),
+                            )
+                          : Text('', style: new TextStyle(fontSize: 1.0)),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: talks[6] != ""
+                      ? Container(
+                          margin: const EdgeInsets.only(left: 45.0),
+                          child: Text(talks[4]),
+                        )
+                      : Container(
+                          margin: const EdgeInsets.only(left: 0.0),
+                          child: Text(talks[4]),
+                        ),
+                ),
+                Divider(color: Color(0x00FFFFFF)),
+                Container(
+                  margin: const EdgeInsets.only(top: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: talks[3] != ""
+                        ? Text(talks[3])
+                        : Text('', style: new TextStyle(fontSize: 1.0)),
+                  ),
+                ),
+                Divider(color: Color(0xFFd2d2d2)),
+
+                Container(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        talks[7] == 0
+                            ? GestureDetector(
+                                onTap: () async {
+                                  talks[7] = 1;
+                                  likeMe(index, talks[0]);
+                                },
+                                child: Icon(
+                                    IconData(0xe97c, fontFamily: 'icomoon'),
+                                    size: 20, color: Colors.grey,))
+                            : GestureDetector(
+                                onTap: () async {
+                                  talks[7] = 0;
+                                  likeMe(index, talks[0]);
+                                },
+                                child: new IconTheme(
+                                  data: new IconThemeData(color: vupycolor),
+                                  child: Icon(
+                                      IconData(0xe900, fontFamily: 'icomoon'),
+                                      size: 20,),
+                                ),
+                              ),
+                        GestureDetector(
+                          onTap: () async {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Comments(
+                                  id: talks[0],
+                                  name: talks[5],
+                                  image: talks[6],
+                                  myname: name,
+                                  text: talks[3],
+                                  returnPage: "/vupy",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Icon(IconData(0xe998, fontFamily: 'icomoon'),
+                              size: 20, color: Colors.grey,),
+                        ),
+                        Icon(IconData(0xe9ce, fontFamily: 'icomoon'), size: 20, color: Colors.grey,),
+                      ]
+                    ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     void _onItemTapped(int index) {
@@ -230,9 +458,9 @@ class _HomePageVupy extends State<HomePageVupy> {
             onPressed: () async {
               await gnpTime.cancel();
               fail = true;
-              var prefs = await SharedPreferences.getInstance();
-              prefs.clear();
-              Navigator.pushReplacementNamed(context, '/log');
+              // var prefs = await SharedPreferences.getInstance();
+              // prefs.clear();
+              Navigator.pushReplacementNamed(context, '/bottom');
             },
           ),
         ],
@@ -266,14 +494,14 @@ class _HomePageVupy extends State<HomePageVupy> {
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Colors.grey, width: 1.0),
+                                      color: Color(0xffe6ecf0), width: 2.0),
                                 ),
                               ),
                               style: new TextStyle(
                                 height: 1.0,
                               )),
                           Container(
-                            margin: const EdgeInsets.only(top: 15.0),
+                            margin: const EdgeInsets.only(top: 5.0),
                             child: Row(
                               children: [
                                 Expanded(
@@ -309,6 +537,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                             .spaceAround,
                                                     children: <Widget>[
                                                       MaterialButton(
+                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                                         onPressed: () {
                                                           ftGaleria();
                                                           Navigator.pop(
@@ -319,6 +548,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                         textColor: white,
                                                       ),
                                                       MaterialButton(
+                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                                         onPressed: () {
                                                           ftCamera();
                                                           Navigator.pop(
@@ -374,6 +604,9 @@ class _HomePageVupy extends State<HomePageVupy> {
                                 Expanded(
                                     flex: 1,
                                     child: MaterialButton(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
                                       height: 40.0,
                                       child: Text("Publicar"),
                                       onPressed: () {
@@ -384,9 +617,6 @@ class _HomePageVupy extends State<HomePageVupy> {
                                     )),
                               ],
                             ),
-                          ),
-                          Divider(
-                            color: Colors.white,
                           ),
                           image != ""
                               ? Container(
@@ -414,18 +644,19 @@ class _HomePageVupy extends State<HomePageVupy> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return new PostCard(
-                      talks: talks[index],
-                      index: index,
-                      myId: myId,
-                      api: api,
-                      name: name,
-                      returnPage: "/vupy",
+                    return postCard(
+                      talks[index],
+                      index,
+                      context,
                     );
+                    // return Text("sda " + index.toString());
                   },
                   childCount: talks.length,
                 ),
               ),
+
+              /* ------------- END POSTS ------------- */
+
             ],
           ),
           _visible == true
@@ -527,6 +758,8 @@ class _HomePageVupy extends State<HomePageVupy> {
               icon: Icon(IconData(0xea00, fontFamily: 'icomoon')),
               title: Text('Perfil')),
         ],
+        backgroundColor: Color(0xffffffff),
+
         currentIndex: _selectedIndex,
         fixedColor: vupycolor,
         onTap: _onItemTapped,

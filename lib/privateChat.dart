@@ -230,7 +230,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
           onPressed: () async {
             await gnpTime.cancel();
             fail = 1;
-            Navigator.pushReplacementNamed(context, "/chat");
+            Navigator.pushReplacementNamed(context, "/bottom");
           },
         ),
       ),
@@ -259,99 +259,105 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return Container(
-                                padding: talks[index][2] == id
-                                    ? EdgeInsets.only(
-                                        left:
-                                            MediaQuery.of(context).size.width *
-                                                0.32,
-                                      )
-                                    : EdgeInsets.only(
-                                        right:
-                                            MediaQuery.of(context).size.width *
-                                                0.32,
-                                      ),
-                                margin: const EdgeInsets.only(
-                                    top: 10.0, left: 5.0, right: 5.0),
-                                child: Container(
-                                  constraints: BoxConstraints(
-                                      minWidth: 50,
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              0.2),
-                                  decoration: new BoxDecoration(
-                                    color: talks[index][2] == id
-                                        ? Color(0Xff347cd5)
-                                        : Color(0Xffe6ecf0),
-                                    border: new Border.all(
-                                      width: 0.0,
-                                      color: const Color(0x00000000),
-                                    ),
-                                    borderRadius:
-                                        new BorderRadius.circular(5.0),
-                                    boxShadow: [
-                                      new BoxShadow(
-                                        color: const Color(0x23000000),
-                                        blurRadius: 3.0,
-                                      )
-                                    ],
-                                  ),
+                                  padding: talks[index][2] == id
+                                      ? EdgeInsets.only(
+                                          left: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.32,
+                                        )
+                                      : EdgeInsets.only(
+                                          right: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.32,
+                                        ),
+                                  margin: const EdgeInsets.only(
+                                      top: 10.0, left: 5.0, right: 5.0),
                                   child: Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      talks[index][3] != ""
-                                          ? Image.network(
-                                              url + talks[index][3],
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.8,
+                                      Container(
+                                        decoration: new BoxDecoration(
+                                          color: talks[index][2] == id
+                                              ? Color(0Xff347cd5)
+                                              : Color(0Xffe6ecf0),
+                                          border: new Border.all(
+                                            width: 0.0,
+                                            color: const Color(0x00000000),
+                                          ),
+                                          borderRadius:
+                                              new BorderRadius.circular(5.0),
+                                          boxShadow: [
+                                            new BoxShadow(
+                                              color: const Color(0x23000000),
+                                              blurRadius: 3.0,
                                             )
-                                          : Container(),
-                                      talks[index][4] != ""
-                                          ? Container(
+                                          ],
+                                        ),
+                                        child: Column(
+                                          children: <Widget>[
+                                            talks[index][3] != ""
+                                                ? Image.network(
+                                                    url + talks[index][3],
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                  )
+                                                : Container(),
+                                            talks[index][4] != ""
+                                                ? Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 6, right: 6),
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: Text(
+                                                        talks[index][4],
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          height: 1.4,
+                                                          color: talks[index]
+                                                                      [2] ==
+                                                                  id
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(),
+                                            Container(
                                               margin: EdgeInsets.only(
-                                                  left: 6, right: 6),
+                                                  left: 6,
+                                                  bottom: 6,
+                                                  right: 6,
+                                                  top: 8),
                                               child: Align(
-                                                alignment: Alignment.centerLeft,
+                                                alignment: talks[index][2] == id
+                                                    ? Alignment.centerRight
+                                                    : Alignment.centerLeft,
                                                 child: Text(
-                                                  talks[index][4],
+                                                  talks[index][5],
                                                   style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w400,
-                                                    height: 1.4,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 13,
                                                     color: talks[index][2] == id
                                                         ? Colors.white
                                                         : Colors.black,
                                                   ),
                                                 ),
                                               ),
-                                            )
-                                          : Container(),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 6,
-                                            bottom: 6,
-                                            right: 6,
-                                            top: 8),
-                                        child: Align(
-                                          alignment: talks[index][2] == id
-                                              ? Alignment.centerRight
-                                              : Alignment.centerLeft,
-                                          child: Text(
-                                            talks[index][5],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13,
-                                              color: talks[index][2] == id
-                                                  ? Colors.white
-                                                  : Colors.black,
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ),
-                              );
+                                  ));
                             },
                             childCount: talks.length,
                           ),

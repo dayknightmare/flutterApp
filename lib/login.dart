@@ -81,7 +81,7 @@ class _Loginpage extends State<Loginpage> {
                           prefs.setInt('userid', iduser);
                           prefs.setString("api", apicad);
 
-                          Navigator.pushReplacementNamed(context, "/vupy");
+                          Navigator.pushReplacementNamed(context, "/bottom");
                         } else if (i == "no") {
                           print("no");
                         } else {

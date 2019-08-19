@@ -136,7 +136,8 @@ class _PerfilPage extends State<PerfilPage> {
                                 width: MediaQuery.of(context).size.width / 2.4,
                                 height: MediaQuery.of(context).size.width / 2.4,
                                 decoration: BoxDecoration(
-                                    border: Border.all(width: 0),
+                                    border: Border.all(width: 0,color: Color(0x01000001)),
+                                    
                                     borderRadius: BorderRadius.circular(100)),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
@@ -152,8 +153,8 @@ class _PerfilPage extends State<PerfilPage> {
                           ),
                         ),
                         Container(
-                          height: 75,
-                          padding: EdgeInsets.only(top: 20),
+                          height: 50,
+                          padding: EdgeInsets.only(top: 10),
                           width: MediaQuery.of(context).size.width,
                           color: Colors.white,
                           child: Text(
@@ -172,10 +173,13 @@ class _PerfilPage extends State<PerfilPage> {
                   ),
                 ]),
               ),
+
+              /* ------ POSTS ------ */
+
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return new PostCard(
+                    return PostCard(
                       talks: talks[index],
                       index: index,
                       myId: myId,
@@ -204,6 +208,7 @@ class _PerfilPage extends State<PerfilPage> {
               title: Text('Perfil')),
 //                    BottomNavigationBarItem(icon: Icon(IconData(0xe9cd,fontFamily:'icomoon')), title: Text('Configurações')),
         ],
+        backgroundColor: Color(0xffffffff),
         currentIndex: _selectedIndex,
         fixedColor: vupycolor,
         onTap: _onItemTapped,

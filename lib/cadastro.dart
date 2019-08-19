@@ -143,7 +143,7 @@ class _Createpage extends State<Createpage> {
                             prefs.setInt('userid', iduser);
                             prefs.setString("api", apicad);
 
-                            Navigator.pushReplacementNamed(context, "/vupy");
+                            // Navigator.pushReplacementNamed(context, "/vupy");
                           } else if (i == "no") {
                             print("no");
                           } else {

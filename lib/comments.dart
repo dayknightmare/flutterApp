@@ -232,13 +232,14 @@ class _Comments extends State<Comments> {
                           Align(
                             alignment: Alignment.center,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              // mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 image != ""
                                     ? Container(
                                         width: 40,
                                         height: 40,
-                                        margin: EdgeInsets.only(right: 6),
+                                        margin:
+                                            EdgeInsets.only(right: 6, left: 10),
                                         decoration: BoxDecoration(
                                             border: Border.all(
                                                 width: 0,
@@ -286,6 +287,7 @@ class _Comments extends State<Comments> {
                             color: Color(0x00000000),
                           ),
                           Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
                             child: Column(
                               children: <Widget>[
                                 TextField(
@@ -299,11 +301,11 @@ class _Comments extends State<Comments> {
                                           const EdgeInsets.all(15.0),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Colors.black, width: 1.5),
+                                            color: Color(0xffC1C6C9), width: 1.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Colors.grey, width: 1.0),
+                                            color: Color(0xffe6ecf0), width: 2.0),
                                       ),
                                     ),
                                     style: new TextStyle(
@@ -317,15 +319,22 @@ class _Comments extends State<Comments> {
                                         flex: 1,
                                         child: Row(
                                           children: <Widget>[
-                                            SizedBox(
-                                              height: 50,
+                                            Container(
+                                              margin: EdgeInsets.only(right: 5),
+                                              height: 40,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                color: vupycolor,
+                                                border: Border.all(color: Colors.white12),
+                                                borderRadius: BorderRadius.circular(200)
+                                              ),
                                               child: IconButton(
                                                 highlightColor:
                                                     Color(0x000ff000),
                                                 icon: Icon(
                                                   IconData(0xe92b,
                                                       fontFamily: "icomoon"),
-                                                  color: vupycolor,
+                                                  color: Colors.white,
                                                   size: 18,
                                                 ),
                                                 onPressed: () {
@@ -341,6 +350,7 @@ class _Comments extends State<Comments> {
                                                                     .spaceAround,
                                                             children: <Widget>[
                                                               MaterialButton(
+                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                                                 onPressed: () {
                                                                   ftGaleria();
                                                                   Navigator.pop(
@@ -355,6 +365,8 @@ class _Comments extends State<Comments> {
                                                                         .white,
                                                               ),
                                                               MaterialButton(
+                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                                
                                                                 onPressed: () {
                                                                   ftCamera();
                                                                   Navigator.pop(
@@ -378,15 +390,22 @@ class _Comments extends State<Comments> {
                                                 color: Color(0xff4587a6),
                                               ),
                                             ),
-                                            SizedBox(
-                                              height: 50,
+                                            Container(
+                                              height: 40,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                color: vupycolor,
+                                                border: Border.all(color: Colors.white12),
+                                                borderRadius: BorderRadius.circular(200)
+                                              ),
                                               child: IconButton(
+                                                
                                                 highlightColor:
                                                     Color(0x0000ff00),
                                                 icon: Icon(
                                                   IconData(0xe9dc,
                                                       fontFamily: "icomoon"),
-                                                  color: vupycolor,
+                                                  color: Colors.white,
                                                   size: 18,
                                                 ),
                                                 onPressed: () {
@@ -407,6 +426,7 @@ class _Comments extends State<Comments> {
                                       Expanded(
                                         flex: 1,
                                         child: MaterialButton(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                           onPressed: () {
                                             postCommentsPub();
                                           },
@@ -434,7 +454,7 @@ class _Comments extends State<Comments> {
                                             alignment: Alignment.topRight,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                border: Border.all(width: 0),
+                                                border: Border.all(width: 0,color: Color(0x01000001)),
                                                 borderRadius: BorderRadius.only(
                                                     bottomLeft:
                                                         Radius.circular(20)),
@@ -456,7 +476,7 @@ class _Comments extends State<Comments> {
                                             ),
                                           ),
                                           decoration: BoxDecoration(
-                                              border: Border.all(width: 0),
+                                              border: Border.all(width: 0,color: Color(0x01000001)),
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               image: DecorationImage(
@@ -509,9 +529,14 @@ class _Comments extends State<Comments> {
                                 ),
                           Container(
                             padding: EdgeInsets.all(4),
-                            color: Color(0xfff0f0f6),
+                            // color: Color(0xfff0f0f6),
                             width: MediaQuery.of(context).size.width - 67,
                             margin: EdgeInsets.only(left: 7),
+                            decoration: BoxDecoration(
+                                color: Color(0xfff0f0f6),
+                                border:
+                                    Border.all(width: 0, color: Colors.white),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Column(
                               children: <Widget>[
                                 Align(

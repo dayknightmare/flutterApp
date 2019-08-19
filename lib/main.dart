@@ -2,15 +2,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 
-import 'home.dart';
-import 'perfil.dart';
+// import 'home.dart';
+// import 'perfil.dart';
 import 'settings.dart';
 import 'login.dart';
 import 'cadastro.dart';
 import 'perfilfts.dart';
-import 'chat.dart';
+// import 'chat.dart';
 import 'privateChat.dart';
 import 'comments.dart';
+import 'bottomAll.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -31,27 +32,27 @@ Route routes(RouteSettings settings) {
   switch (settings.name) {
     case '/log':
       return PageTransition(
-          child: MyApp(), type: PageTransitionType.leftToRightWithFade);
+          child: MyApp(), type: PageTransitionType.upToDown);
 
-    case '/vupy':
-      return PageTransition(
-          child: HomePageVupy(), type: PageTransitionType.rightToLeftWithFade);
+    // case '/vupy':
+    //   return PageTransition(
+    //       child: HomePageVupy(), type: PageTransitionType.rightToLeftWithFade);
 
     case '/perfilFt':
       return PageTransition(
-          child: PerfilFtPage(), type: PageTransitionType.rightToLeftWithFade);
+          child: PerfilFtPage(), type: PageTransitionType.downToUp);
 
     case '/settings':
       return PageTransition(
-          child: Settings(), type: PageTransitionType.leftToRightWithFade);
+          child: Settings(), type: PageTransitionType.downToUp);
 
-    case '/perfil':
-      return PageTransition(
-          child: PerfilPage(), type: PageTransitionType.leftToRightWithFade);
+    // case '/perfil':
+    //   return PageTransition(
+    //       child: PerfilPage(), type: PageTransitionType.leftToRightWithFade);
 
-    case '/chat':
-      return PageTransition(
-          child: ChatVupy(), type: PageTransitionType.leftToRightWithFade);
+    // case '/chat':
+    //   return PageTransition(
+    //       child: ChatVupy(), type: PageTransitionType.leftToRightWithFade);
 
     case '/privatechat':
       return PageTransition(
@@ -60,6 +61,11 @@ Route routes(RouteSettings settings) {
     case '/comments':
       return PageTransition(
           child: Comments(), type: PageTransitionType.downToUp);
+  
+    case '/bottom':
+      return PageTransition(
+        child: MyHomePage(), type: PageTransitionType.upToDown
+      );
 
     default:
       return null;
@@ -89,7 +95,7 @@ class _MyApp extends State<MyApp> {
       var value = prefs.getInt(key) ?? 0;
       print(value);
       if (value != 0) {
-        Navigator.pushReplacementNamed(context, "/vupy");
+        Navigator.pushReplacementNamed(context, "/bottom");
       }
     }
 

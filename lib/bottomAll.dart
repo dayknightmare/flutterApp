@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
               icon: Icon(IconData(0xea00, fontFamily: 'icomoon')),
               title: Text('Perfil')),
+              
         ],
         backgroundColor: Colors.white,
         currentIndex: _selectedIndex,

@@ -57,6 +57,8 @@ class _Loginpage extends State<Loginpage> {
               ),
               Divider(color: Color(0x00FFFFFF)),
               ButtonTheme(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                   height: 50.0,
                   minWidth: 400.0,
                   child: RaisedButton(
@@ -83,10 +85,31 @@ class _Loginpage extends State<Loginpage> {
 
                           Navigator.pushReplacementNamed(context, "/bottom");
                         } else if (i == "no") {
-                          print("no");
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return AlertDialog(
+                                content: Container(
+                                  child: Text("Senha e/ou usuário invalido(s). Tente novamnete!"),
+                                ),
+                              );
+                            },
+                          );
+                          
                         } else {
-                          print("error");
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return AlertDialog(
+                                content: Container(
+                                  child: Text("Senha e/ou usuário invalido(s). Tente novamnete!"),
+                                ),
+                              );
+                            },
+                          );
                         }
+                        userF.text = "";
+                        password.text = "";
                       }
                     },
                     child: Text("Login", style: TextStyle(color: Colors.white)),

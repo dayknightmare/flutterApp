@@ -1,8 +1,6 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async';
 
 const vupycolor = Color(0xFFE7002A);
 
@@ -21,7 +19,7 @@ class _Createpage extends State<Createpage> {
   int iduser;
   String apicad;
 
-  Future<String> cadastro(String url, Map body) async {
+  void cadastro(String url, Map body) async {
     var jsona = {};
     jsona["user"] = body["user"];
     jsona["pass"] = body["pass"];
@@ -31,32 +29,31 @@ class _Createpage extends State<Createpage> {
     var r = await http.post(Uri.encodeFull(url), body: json.encode(jsona));
     var resposta = json.decode(r.body);
 
-    if (resposta["resposta"][0] == "ok") {
-      iduser = resposta["resposta"][1];
-      apicad = resposta['resposta'][2];
-      return "ok";
-    }
-    else {
-      print(resposta['resposta']);
-      List<Widget> errors = new List<Widget>();
-      for (var i in resposta['resposta']) {
-        errors.add(Text(i));
-      }
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Container(
-              child: Wrap(
-                children: errors,
-              ),
-            ),
-          );
-        },
-      );
-      return "no";
+    print(resposta);
+
+    List<Widget> errors = new List<Widget>();
+    for (var i in resposta['resposta']) {
+      errors.add(Text(i));
     }
 
+    password1.text = "";
+    password2.text = "";
+    userS.text = "";
+    email.text = "";
+    nome.text = "";
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Container(
+            child: Wrap(
+              children: errors,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -101,6 +98,7 @@ class _Createpage extends State<Createpage> {
               ),
               Divider(color: Color(0x00FFFFFF)),
               ButtonTheme(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   height: 50.0,
                   minWidth: 400.0,
                   child: RaisedButton(
@@ -135,20 +133,8 @@ class _Createpage extends State<Createpage> {
                           data['nome'] = nome.text;
                           data['email'] = email.text;
 
-                          var i = await cadastro(
-                              'http://179.233.213.76/workserver/signup/',
-                              data);
-                          if (i == "ok") {
-                            var prefs = await SharedPreferences.getInstance();
-                            prefs.setInt('userid', iduser);
-                            prefs.setString("api", apicad);
-
-                            // Navigator.pushReplacementNamed(context, "/vupy");
-                          } else if (i == "no") {
-                            print("no");
-                          } else {
-                            print("error");
-                          }
+                          cadastro(
+                              'http://179.233.213.76/workserver/signup/', data);
                         }
                       }
                     },

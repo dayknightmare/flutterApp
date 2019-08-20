@@ -9,6 +9,7 @@ import '../privateChat.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 
+
 class ChatVupy extends StatefulWidget {
   @override
   State createState() => _ChatVupy();

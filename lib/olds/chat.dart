@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
-import 'privateChat.dart';
+import '../privateChat.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 

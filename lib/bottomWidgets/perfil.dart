@@ -5,8 +5,6 @@ import '../widgets/postCard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
-
-
 class Perfil extends StatefulWidget {
   Perfil({Key key, this.title}) : super(key: key);
 
@@ -16,7 +14,6 @@ class Perfil extends StatefulWidget {
 }
 
 class _Perfil extends State<Perfil> {
-
   int myId;
   String url = "http://179.233.213.76",
       api,
@@ -58,6 +55,7 @@ class _Perfil extends State<Perfil> {
     void lets() async {
       getP();
     }
+
     lets();
     super.initState();
   }
@@ -75,6 +73,31 @@ class _Perfil extends State<Perfil> {
         CustomScrollView(
           semanticChildCount: talks.length,
           slivers: <Widget>[
+            SliverAppBar(
+              floating: true,
+              title: Text("Perfil"),
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(IconData(0xe98f, fontFamily: 'icomoon'),
+                      color: Colors.black),
+                  onPressed: () async {
+                    var prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    Navigator.pushReplacementNamed(context, '/log');
+                  },
+                ),
+              ],
+              leading: IconButton(
+                icon: Icon(IconData(0xe95d, fontFamily: 'icomoon'),
+                    color: Colors.black),
+                onPressed: () async {
+                  Navigator.pushNamed(context, "/perfilFt");
+                  // Navigator.push(context, route)
+                },
+              ),
+            ),
             SliverList(
               delegate: SliverChildListDelegate([
                 Container(

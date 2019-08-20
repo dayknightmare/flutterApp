@@ -14,7 +14,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
-import 'comments.dart';
+import '../comments.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);

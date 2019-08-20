@@ -30,7 +30,7 @@ class _Loginpage extends State<Loginpage> {
       apicad = resposta['resposta'][3];
       return "ok";
     } else {
-      return "no";
+      return resposta["resposta"][0];
     }
   }
 
@@ -84,25 +84,13 @@ class _Loginpage extends State<Loginpage> {
                           prefs.setString("api", apicad);
 
                           Navigator.pushReplacementNamed(context, "/bottom");
-                        } else if (i == "no") {
-                          showDialog(
-                            context: context,
-                            builder: (context){
-                              return AlertDialog(
-                                content: Container(
-                                  child: Text("Senha e/ou usuário invalido(s). Tente novamnete!"),
-                                ),
-                              );
-                            },
-                          );
-                          
                         } else {
                           showDialog(
                             context: context,
                             builder: (context){
                               return AlertDialog(
                                 content: Container(
-                                  child: Text("Senha e/ou usuário invalido(s). Tente novamnete!"),
+                                  child: Text(i),
                                 ),
                               );
                             },

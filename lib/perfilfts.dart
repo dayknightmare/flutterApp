@@ -275,7 +275,10 @@ class _PerfilFtPage extends State<PerfilFtPage> {
             icon: Icon(IconData(0xea10, fontFamily: 'icomoon'),
                 color: Colors.black),
             onPressed: () async {
-              Navigator.pushNamed(context, '/bottom');
+              // Navigator.pushNamed(context, '/bottom');
+            //  Navigator.pop(context);
+            //  Navigator.pus(context, "/bottom");
+              Navigator.pushReplacementNamed(context, '/bottom');            
             },
           ),
         ],
@@ -285,10 +288,12 @@ class _PerfilFtPage extends State<PerfilFtPage> {
                     color: Colors.black),
                 onPressed: () async {
                   await sendFTs();
-                  Navigator.of(context).pushNamed("/bottom");
+                  // Navigator.of(context).pushNamed("/bottom");
+                  Navigator.pushReplacementNamed(context, '/bottom');
+                //  Navigator.pop(context);
                 },
               )
-            : null,
+            : Container(),
       ),
       body: SingleChildScrollView(
         child: Container(

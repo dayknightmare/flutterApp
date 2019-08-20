@@ -208,7 +208,7 @@ class _Comments extends State<Comments> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () =>
-              {Navigator.pushReplacementNamed(context, returnPage)},
+              {Navigator.pop(context)},
           icon: Icon(
             IconData(0xe913, fontFamily: 'icomoon'),
             color: Colors.black,

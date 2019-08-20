@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
+import '../otherperfil.dart';
 import '../privateChat.dart';
 
 const vupycolor = const Color(0xFFE7002B);
@@ -45,19 +46,50 @@ class _ChatVupy extends State<ChatVupy> {
 
   @override
   Widget build(BuildContext context) {
-
     return Stack(
       children: <Widget>[
         CustomScrollView(
           semanticChildCount: friends.length,
           slivers: <Widget>[
+            SliverAppBar(
+              floating: true,
+              title: Text('Conversas'),
+              backgroundColor: Colors.white,
+              centerTitle: true,
+              leading: Container(),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(IconData(0xe98f, fontFamily: 'icomoon'),
+                      color: Colors.black),
+                  onPressed: () async {
+                    var prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    Navigator.pushReplacementNamed(context, '/log');
+                  },
+                ),
+              ],
+            ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   return Container(
+                    color: Colors.white,
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(url + friends[index][2]),
+                      ),
+                      trailing: IconButton(
+                        color: vupycolor,
+                        icon: Icon(IconData(0xea00, fontFamily: 'icomoon')),
+                        onPressed: () {
+                          Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OtherPerfil(
+                                      idFr: friends[index][0],
+                                    ),
+                                  ));
+                        },
                       ),
                       title: Text(friends[index][1]),
                       onTap: () {

@@ -234,9 +234,20 @@ class _PostCard extends State<PostCard> {
                                 ),
                           GestureDetector(
                             onTap: () async {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
+                              // Navigator.pushReplacement(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => Comments(
+                              //       id: talks[0],
+                              //       name: talks[5],
+                              //       image: talks[6],
+                              //       myname: name,
+                              //       text: talks[3],
+                              //       returnPage: returnPage,
+                              //     ),
+                              //   ),
+                              // );
+                              Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => Comments(
                                     id: talks[0],
                                     name: talks[5],
@@ -245,7 +256,7 @@ class _PostCard extends State<PostCard> {
                                     text: talks[3],
                                     returnPage: returnPage,
                                   ),
-                                ),
+                                )
                               );
                             },
                             child: Icon(IconData(0xe998, fontFamily: 'icomoon'),

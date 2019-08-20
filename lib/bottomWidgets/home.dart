@@ -15,6 +15,7 @@ import 'dart:async';
 import 'dart:io';
 
 import '../comments.dart';
+import '../otherperfil.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
@@ -117,8 +118,7 @@ class _HomePageVupy extends State<HomePageVupy> {
         }
       }
       if (this.mounted) {
-        
-        setState(() {}); 
+        setState(() {});
       }
     }
   }
@@ -261,9 +261,7 @@ class _HomePageVupy extends State<HomePageVupy> {
       margin: const EdgeInsets.only(top: 10.0),
       child: Column(
         children: [
-          talks[2] != ""
-              ? Image.network(url + talks[2])
-              : Text('', style: new TextStyle(fontSize: 1.0)),
+          talks[2] != "" ? Image.network(url + talks[2]) : Container(),
           Container(
             padding: new EdgeInsets.all(10.0),
             child: Column(
@@ -272,30 +270,41 @@ class _HomePageVupy extends State<HomePageVupy> {
                   child: Row(
                     children: [
                       Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            talks[6] != ""
-                                ? Container(
-                                    margin: const EdgeInsets.only(right: 5.0),
-                                    child: new ClipRRect(
-                                      borderRadius:
-                                          new BorderRadius.circular(50.0),
-                                      child: Image.network(
-                                        url + talks[6],
-                                        height: 40.0,
-                                        width: 40.0,
-                                      ),
-                                    ))
-                                : Text(''),
-                            Text(talks[5],
-                                style: new TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w400,
-                                )),
-                          ],
-                        ),
-                      ),
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OtherPerfil(
+                                      idFr: talks[1],
+                                    ),
+                                  ));
+                            },
+                            child: Row(
+                              children: [
+                                talks[6] != ""
+                                    ? Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 5.0),
+                                        child: new ClipRRect(
+                                          borderRadius:
+                                              new BorderRadius.circular(50.0),
+                                          child: Image.network(
+                                            url + talks[6],
+                                            height: 40.0,
+                                            width: 40.0,
+                                          ),
+                                        ))
+                                    : Text(''),
+                                Text(talks[5],
+                                    style: new TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w400,
+                                    )),
+                              ],
+                            ),
+                          )),
                       talks[1] == myId
                           ? GestureDetector(
                               onTap: () {
@@ -414,19 +423,18 @@ class _HomePageVupy extends State<HomePageVupy> {
                               ),
                         GestureDetector(
                           onTap: () async {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Comments(
-                                  id: talks[0],
-                                  name: talks[5],
-                                  image: talks[6],
-                                  myname: name,
-                                  text: talks[3],
-                                  returnPage: "/bottom",
-                                ),
-                              ),
-                            );
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Comments(
+                                    id: talks[0],
+                                    name: talks[5],
+                                    image: talks[6],
+                                    myname: name,
+                                    text: talks[3],
+                                    returnPage: "/bottom",
+                                  ),
+                                ));
                           },
                           child: Icon(
                             IconData(0xe998, fontFamily: 'icomoon'),
@@ -456,6 +464,24 @@ class _HomePageVupy extends State<HomePageVupy> {
         CustomScrollView(
           semanticChildCount: talks.length,
           slivers: <Widget>[
+            SliverAppBar(
+              floating: true,
+              title: Text('Publicações'),
+              backgroundColor: Colors.white,
+              centerTitle: true,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(IconData(0xe98f, fontFamily: 'icomoon'),
+                      color: Colors.black),
+                  onPressed: () async {
+                    var prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    Navigator.pushReplacementNamed(context, '/log');
+                  },
+                ),
+              ],
+              leading: Container(),
+            ),
             SliverList(
               delegate: SliverChildListDelegate(
                 [

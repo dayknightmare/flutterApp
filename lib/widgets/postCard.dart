@@ -3,23 +3,31 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:vupy/comments.dart';
-
-const vupycolor = Color(0xffe7002a);
+import 'package:vupy/widgets/url.dart';
 
 class PostCard extends StatefulWidget {
   PostCard(
-      {Key key,
+    {
+      Key key,
       this.talks,
       this.index,
       this.myId,
       this.api,
       this.name,
-      this.returnPage})
-      : super(key: key);
+      this.returnPage,
+      this.btn,
+      this.differBtn,
+      this.nav,
+      this.differNav
+    }): super(key: key);
 
   final List talks;
   final int index, myId;
   final String api, name, returnPage;
+  final Color btn;
+  final Color differBtn;
+  final Color nav;
+  final Color differNav;
 
   @override
   State createState() => _PostCard();
@@ -28,7 +36,12 @@ class PostCard extends StatefulWidget {
 class _PostCard extends State<PostCard> {
   int index, myId, deleted = 0;
   List talks;
-  String url = "http://179.233.213.76", api, name, returnPage;
+  String url = URL().getUrl(), api, name, returnPage;
+  String ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png";
+  Color vupycolor;
+  Color differBtn;
+  Color nav;
+  Color differNav;
 
   @override
   void initState() {
@@ -38,6 +51,10 @@ class _PostCard extends State<PostCard> {
     api = widget.api;
     name = widget.name;
     returnPage = widget.returnPage;
+    vupycolor = widget.btn;
+    differBtn = widget.differBtn;
+    differNav = widget.differNav;
+    nav = widget.nav;
     setState(() {});
     super.initState();
   }
@@ -73,199 +90,192 @@ class _PostCard extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return deleted == 0 ? 
+    return deleted == 0 ?
       Container(
-        decoration: new BoxDecoration(
-          color: Colors.white,
-          border: new Border.all(
-            width: 0.0,
-            color: const Color(0x00000000),
-          ),
-          borderRadius: new BorderRadius.circular(5.0),
-          boxShadow: [
-            new BoxShadow(
-              color: const Color(0x23000000),
-              blurRadius: 4.0,
-            )
-          ],
+        decoration: BoxDecoration(
+          color: Colors.white
         ),
-        margin: const EdgeInsets.only(top: 10.0),
+        margin: EdgeInsets.only(top: 10),
         child: Column(
-          children: [
+          children: <Widget>[
             talks[2] != ""
-                ? Image.network(url + talks[2])
-                : Text('', style: new TextStyle(fontSize: 1.0)),
-            Container(
-              padding: new EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Container(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: [
-                              talks[6] != ""
-                                  ? Container(
-                                      margin: const EdgeInsets.only(right: 5.0),
-                                      child: new ClipRRect(
-                                        borderRadius:
-                                            new BorderRadius.circular(50.0),
-                                        child: Image.network(
-                                          url + talks[6],
-                                          height: 40.0,
-                                          width: 40.0,
-                                        ),
-                                      ))
-                                  : Text(''),
-                              Text(talks[5],
-                                  style: new TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w400,
-                                  )),
-                            ],
+              ? Image.network(url + talks[2])
+              : Container(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 5, top: 5),
+                  child: Row(
+                    children: <Widget>[
+                      talks[6] != "" ? 
+                        Container(
+                          width: 40,
+                          height: 40,
+                          margin: const EdgeInsets.only(right: 5.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0x01000001)),
+                            borderRadius: BorderRadius.circular(100),
+                            image: DecorationImage(
+                              image: NetworkImage(url + talks[6]),
+                              fit: BoxFit.cover
+                            )
+                          ),
+                        )
+                      : 
+                        Container(
+                          width: 40,
+                          height: 40,
+                          margin: const EdgeInsets.only(right: 5.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0x01000001)),
+                            borderRadius: BorderRadius.circular(100),
+                            image: DecorationImage(
+                              image: NetworkImage(ftuser),
+                              fit: BoxFit.cover
+                            )
                           ),
                         ),
-                        talks[1] == myId
-                            ? GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text(
-                                            'Você deseja remover essa publicação.'),
-                                        content: SingleChildScrollView(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              ButtonTheme(
-                                                  child: RaisedButton(
-                                                onPressed: () {
-                                                  deletePub(talks[0], index);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Sim",
-                                                    style: TextStyle(
-                                                        color:
-                                                            Color(0xFFFFFFFF))),
-                                                color: vupycolor,
-                                              )),
-                                              ButtonTheme(
-                                                  child: RaisedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Não",
-                                                    style: TextStyle(
-                                                        color:
-                                                            Color(0xFFFFFFFF))),
-                                                color: vupycolor,
-                                              )),
-                                            ],
+                      
+                      Text(talks[5]),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: talks[1] == myId ?
+                    IconButton(
+                      icon: Icon(
+                        IconData(0xea10, fontFamily: 'icomoon'),
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      onPressed: (){
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text(
+                                  'Você deseja remover essa publicação.'),
+                              content: SingleChildScrollView(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    MaterialButton(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          child: Text(
+                                            "Sim", style: TextStyle(color: differBtn),
                                           ),
+                                          onPressed: (){
+                                            deletePub(talks[0], index);
+                                            Navigator.pop(context);
+                                          },
+                                          color: vupycolor,
                                         ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  padding: new EdgeInsets.all(5.0),
-                                  margin: const EdgeInsets.only(right: 5.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text("X"),
-                                  ),
+                                        MaterialButton(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+
+                                          child: Text(
+                                            "Não", style: TextStyle(color: differBtn),
+                                          ),
+                                          onPressed: (){
+                                            Navigator.pop(context);
+                                          },
+                                          color: vupycolor,
+                                        ),
+                                  ],
                                 ),
-                              )
-                            : Text('', style: new TextStyle(fontSize: 1.0)),
-                      ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )
+                  :
+                    Container()
+                )
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.only(left: 45.0),
+                child: Text(talks[4]),
+              ),
+            ),
+            Divider(color: Color(0x00FFFFFF)),
+            Container(
+              margin: const EdgeInsets.only(top: 8.0, left: 45, right: 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: talks[3] != ""
+                    ? Text(talks[3])
+                    : Container(),
+              ),
+            ),
+            Divider(color: Color(0xFFd2d2d2)),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  talks[7] == 0 ? 
+                    FlatButton.icon(
+                      icon: Icon(
+                        IconData(0xe97c, fontFamily: 'icomoon'),
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      label: Text("${talks[8]}"),
+                      onPressed: (){
+                        talks[7] = 1;
+                        likeMe(index, talks[0]);
+                      },
+                    )
+                  : 
+                    FlatButton.icon(
+                      icon: Icon(
+                        IconData(0xe900, fontFamily: 'icomoon'),
+                        size: 20,
+                        color: vupycolor,
+                      ),
+                      label: Text("${talks[8]}"),
+                      onPressed: (){
+                        talks[7] = 0;
+                        likeMe(index, talks[0]);
+                      },
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: talks[6] != ""
-                        ? Container(
-                            margin: const EdgeInsets.only(left: 45.0),
-                            child: Text(talks[4]),
-                          )
-                        : Container(
-                            margin: const EdgeInsets.only(left: 0.0),
-                            child: Text(talks[4]),
-                          ),
-                  ),
-                  Divider(color: Color(0x00FFFFFF)),
-                  Container(
-                    margin: const EdgeInsets.only(top: 8.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: talks[3] != ""
-                          ? Text(talks[3])
-                          : Text('', style: new TextStyle(fontSize: 1.0)),
+
+                  FlatButton.icon(
+                    icon: Icon(
+                      IconData(0xe998, fontFamily: 'icomoon'),
+                      size: 20,
+                      color: Colors.grey,
                     ),
-                  ),
-                  Divider(color: Color(0xFFd2d2d2)),
-                  Container(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          talks[7] == 0
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    talks[7] = 1;
-                                    likeMe(index, talks[0]);
-                                  },
-                                  child: Icon(
-                                      IconData(0xe97c, fontFamily: 'icomoon'),
-                                      size: 20,color: Colors.grey))
-                              : GestureDetector(
-                                  onTap: () async {
-                                    talks[7] = 0;
-                                    likeMe(index, talks[0]);
-                                  },
-                                  child: new IconTheme(
-                                    data: new IconThemeData(color: vupycolor),
-                                    child: Icon(
-                                        IconData(0xe900, fontFamily: 'icomoon'),
-                                        size: 20),
-                                  ),
-                                ),
-                          GestureDetector(
-                            onTap: () async {
-                              // Navigator.pushReplacement(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => Comments(
-                              //       id: talks[0],
-                              //       name: talks[5],
-                              //       image: talks[6],
-                              //       myname: name,
-                              //       text: talks[3],
-                              //       returnPage: returnPage,
-                              //     ),
-                              //   ),
-                              // );
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => Comments(
-                                    id: talks[0],
-                                    name: talks[5],
-                                    image: talks[6],
-                                    myname: name,
-                                    text: talks[3],
-                                    returnPage: returnPage,
-                                  ),
-                                )
-                              );
-                            },
-                            child: Icon(IconData(0xe998, fontFamily: 'icomoon'),
-                                size: 20,color: Colors.grey),
+                    label: Text("${talks[10]}"),
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => Comments(
+                            id: talks[0],
+                            name: talks[5],
+                            image: talks[6],
+                            myname: name,
+                            text: talks[3],
+                            returnPage: returnPage,
+                            btn: vupycolor,
+                            differBtn: differBtn,
+                            differNav: differNav,
+                            nav: nav,
                           ),
-                          Icon(IconData(0xe9ce, fontFamily: 'icomoon'), size: 20, color: Colors.grey,),
-                        ]),
+                        )
+                      );
+                    },
                   ),
-                ],
+                  FlatButton.icon(
+                    onPressed: (){},
+                    label: Text("${talks[9]}"),
+                    icon: Icon(IconData(0xe9ce, fontFamily: 'icomoon'), size: 20, color: Colors.grey,),
+                  )
+                ]
               ),
             ),
           ],

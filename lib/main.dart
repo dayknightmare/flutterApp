@@ -2,13 +2,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 
-// import 'home.dart';
-// import 'perfil.dart';
 import 'settings.dart';
 import 'login.dart';
 import 'cadastro.dart';
 import 'perfilfts.dart';
-// import 'chat.dart';
 import 'privateChat.dart';
 import 'comments.dart';
 import 'bottomAll.dart';
@@ -21,7 +18,8 @@ void main() => runApp(new MaterialApp(
         primarySwatch: Colors.red,
         primaryTextTheme: TextTheme(title: TextStyle(color: Colors.black)),
         primaryColor: Colors.black,
-        accentColor: vupycolor,
+        accentColor: Colors.black,
+        fontFamily: "Poppins",
       ),
       home: new MyApp(),
       debugShowCheckedModeBanner: false,
@@ -34,10 +32,6 @@ Route routes(RouteSettings settings) {
       return PageTransition(
           child: MyApp(), type: PageTransitionType.upToDown);
 
-    // case '/vupy':
-    //   return PageTransition(
-    //       child: HomePageVupy(), type: PageTransitionType.rightToLeftWithFade);
-
     case '/perfilFt':
       return PageTransition(
           child: PerfilFtPage(), type: PageTransitionType.downToUp);
@@ -45,14 +39,6 @@ Route routes(RouteSettings settings) {
     case '/settings':
       return PageTransition(
           child: Settings(), type: PageTransitionType.downToUp);
-
-    // case '/perfil':
-    //   return PageTransition(
-    //       child: PerfilPage(), type: PageTransitionType.leftToRightWithFade);
-
-    // case '/chat':
-    //   return PageTransition(
-    //       child: ChatVupy(), type: PageTransitionType.leftToRightWithFade);
 
     case '/privatechat':
       return PageTransition(
@@ -114,7 +100,7 @@ class _MyApp extends State<MyApp> {
             ],
           ),
           centerTitle: true,
-          title: Text('Vupy'),
+          title: Text('Seja bem vindo a Vupy'),
           backgroundColor: white,
         ),
         body: TabBarView(

@@ -8,8 +8,13 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vupy/widgets/emojis.dart';
 
-const vupycolor = const Color(0xFFE7002B);
+import 'bottomAll.dart';
+import 'otherperfil.dart';
+import 'widgets/url.dart';
+
+final TextEditingController commCon = TextEditingController();
 
 class Comments extends StatefulWidget {
   Comments(
@@ -19,25 +24,36 @@ class Comments extends StatefulWidget {
       this.image,
       this.myname,
       this.text,
-      this.returnPage})
+      this.returnPage,
+      this.btn,
+      this.nav,
+      this.differNav,
+      this.differBtn})
       : super(key: key);
 
   final String name, image, myname, text, returnPage;
   final int id;
+  final Color btn, nav, differNav, differBtn;
 
   @override
   State createState() => _Comments();
 }
 
+class Emojis extends EmojisData{
+  Emojis(double media, List emojis) : super(media, emojis);
+
+  @override
+  void addEmoji(emo){
+    commCon.text += emo;
+  }
+}
+
 class _Comments extends State<Comments> {
-  String name, image, imageV, myname, text, api, url = "http://179.233.213.76";
+  String name, image, imageV, myname, text, api, url = URL().getUrl();
   String userDefaultImage =
           "https://vupytcc.pythonanywhere.com/static/img/user.png",
       returnPage,
       filter;
-
-  TextEditingController commCon = TextEditingController();
-  TextEditingController emojicon = TextEditingController();
 
   FocusNode focusComm = FocusNode();
 
@@ -45,11 +61,12 @@ class _Comments extends State<Comments> {
 
   List talks = [];
   List duoemojis = [];
-  List emojis = [];
 
   bool _visible = false;
 
   File file;
+
+  Color vupycolor, nav, differNav, differBtn;
 
   void startComm() async {
     var prefs = await SharedPreferences.getInstance();
@@ -69,8 +86,6 @@ class _Comments extends State<Comments> {
 
     duoemojis =
         json.decode(await rootBundle.loadString('assets/json/finish.json'));
-
-    emojis.addAll(duoemojis);
     if (this.mounted) {
       setState(() {});
     }
@@ -83,10 +98,6 @@ class _Comments extends State<Comments> {
         setState(() {});
       }
     }
-  }
-
-  void addEmoji(index) {
-    commCon.text = commCon.text + emojis[index]["emoji"];
   }
 
   Future<bool> will() async {
@@ -138,7 +149,6 @@ class _Comments extends State<Comments> {
     request.fields['msg'] = commCon.text;
 
     if (imageV != "" && imageV != null) {
-      print(imageV);
       var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
       var length = await file.length();
       var multipartFile = new http.MultipartFile('img', stream, length,
@@ -178,48 +188,41 @@ class _Comments extends State<Comments> {
     image = widget.image;
     text = widget.text;
     returnPage = widget.returnPage;
+    vupycolor = widget.btn;
+    differBtn = widget.differBtn;
+    differNav = widget.differNav;
+    nav = widget.nav;
     startComm();
-    focusComm.addListener(changeFocusPubl);
-    emojicon.addListener(() {
-      filter = emojicon.text;
-      setState(() {
-        emojis.clear();
-
-        if (filter != null || filter != "") {
-          for (var i = 0; i < duoemojis.length; i++) {
-            if (duoemojis[i]['name'].contains(filter)) {
-              emojis.add(duoemojis[i]);
-            }
-          }
-        } else {
-          emojis.addAll(duoemojis);
-        }
-      });
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Comentários"),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          onPressed: () =>
-              {Navigator.pop(context)},
-          icon: Icon(
-            IconData(0xe913, fontFamily: 'icomoon'),
-            color: Colors.black,
-          ),
-        ),
-      ),
       body: Stack(
         children: <Widget>[
           CustomScrollView(
             semanticChildCount: talks.length,
             slivers: <Widget>[
+              SliverAppBar(
+                title: Text(
+                  "Comentários",
+                  style: TextStyle(color: differNav),
+                ),
+                centerTitle: true,
+                backgroundColor: nav,
+                leading: IconButton(
+                  onPressed: () => {Navigator.pop(context)},
+                  icon: Icon(
+                    IconData(0xe913, fontFamily: 'icomoon'),
+                    color: differNav,
+                  ),
+                ),
+                floating: true,
+              ),
               SliverList(
                 delegate: SliverChildListDelegate(
                   [
@@ -254,7 +257,8 @@ class _Comments extends State<Comments> {
                                     : Container(
                                         width: 40,
                                         height: 40,
-                                        margin: EdgeInsets.only(right: 6),
+                                        margin:
+                                            EdgeInsets.only(right: 6, left: 10),
                                         decoration: BoxDecoration(
                                             border: Border.all(
                                                 width: 0,
@@ -301,11 +305,13 @@ class _Comments extends State<Comments> {
                                           const EdgeInsets.all(15.0),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Color(0xffC1C6C9), width: 1.5),
+                                            color: Color(0xffC1C6C9),
+                                            width: 1.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Color(0xffe6ecf0), width: 2.0),
+                                            color: Color(0xffe6ecf0),
+                                            width: 2.0),
                                       ),
                                     ),
                                     style: new TextStyle(
@@ -325,16 +331,16 @@ class _Comments extends State<Comments> {
                                               width: 40,
                                               decoration: BoxDecoration(
                                                 color: vupycolor,
-                                                border: Border.all(color: Colors.white12),
-                                                borderRadius: BorderRadius.circular(200)
+                                                border: Border.all(
+                                                    color: Color(0x01000001)),
+                                                borderRadius:
+                                                    BorderRadius.circular(200),
                                               ),
                                               child: IconButton(
-                                                highlightColor:
-                                                    Color(0x000ff000),
                                                 icon: Icon(
                                                   IconData(0xe92b,
                                                       fontFamily: "icomoon"),
-                                                  color: Colors.white,
+                                                  color: differBtn,
                                                   size: 18,
                                                 ),
                                                 onPressed: () {
@@ -350,7 +356,10 @@ class _Comments extends State<Comments> {
                                                                     .spaceAround,
                                                             children: <Widget>[
                                                               MaterialButton(
-                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8)),
                                                                 onPressed: () {
                                                                   ftGaleria();
                                                                   Navigator.pop(
@@ -361,12 +370,13 @@ class _Comments extends State<Comments> {
                                                                 color:
                                                                     vupycolor,
                                                                 textColor:
-                                                                    Colors
-                                                                        .white,
+                                                                    differBtn,
                                                               ),
                                                               MaterialButton(
-                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                                
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8)),
                                                                 onPressed: () {
                                                                   ftCamera();
                                                                   Navigator.pop(
@@ -377,8 +387,7 @@ class _Comments extends State<Comments> {
                                                                 color:
                                                                     vupycolor,
                                                                 textColor:
-                                                                    Colors
-                                                                        .white,
+                                                                    differBtn,
                                                               )
                                                             ],
                                                           ),
@@ -387,25 +396,25 @@ class _Comments extends State<Comments> {
                                                     },
                                                   );
                                                 },
-                                                color: Color(0xff4587a6),
                                               ),
                                             ),
                                             Container(
                                               height: 40,
                                               width: 40,
                                               decoration: BoxDecoration(
-                                                color: vupycolor,
-                                                border: Border.all(color: Colors.white12),
-                                                borderRadius: BorderRadius.circular(200)
-                                              ),
+                                                  color: vupycolor,
+                                                  border: Border.all(
+                                                      color: Color(0x01000001)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          200)),
                                               child: IconButton(
-                                                
                                                 highlightColor:
                                                     Color(0x0000ff00),
                                                 icon: Icon(
                                                   IconData(0xe9dc,
                                                       fontFamily: "icomoon"),
-                                                  color: Colors.white,
+                                                  color: differBtn,
                                                   size: 18,
                                                 ),
                                                 onPressed: () {
@@ -426,15 +435,16 @@ class _Comments extends State<Comments> {
                                       Expanded(
                                         flex: 1,
                                         child: MaterialButton(
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
                                           onPressed: () {
                                             postCommentsPub();
                                           },
                                           child: Text(
                                             "Comentar",
                                             style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
+                                                fontSize: 15, color: differBtn),
                                           ),
                                           color: vupycolor,
                                         ),
@@ -454,11 +464,13 @@ class _Comments extends State<Comments> {
                                             alignment: Alignment.topRight,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                border: Border.all(width: 0,color: Color(0x01000001)),
+                                                border: Border.all(
+                                                    width: 0,
+                                                    color: Color(0x01000001)),
                                                 borderRadius: BorderRadius.only(
                                                     bottomLeft:
                                                         Radius.circular(20)),
-                                                color: Colors.white,
+                                                color: differBtn,
                                               ),
                                               width: 30,
                                               height: 30,
@@ -476,7 +488,9 @@ class _Comments extends State<Comments> {
                                             ),
                                           ),
                                           decoration: BoxDecoration(
-                                              border: Border.all(width: 0,color: Color(0x01000001)),
+                                              border: Border.all(
+                                                  width: 0,
+                                                  color: Color(0x01000001)),
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               image: DecorationImage(
@@ -503,30 +517,54 @@ class _Comments extends State<Comments> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          talks[index][5] == ""
-                              ? Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 0, color: Color(0x00ffffff)),
-                                      borderRadius: BorderRadius.circular(1000),
-                                      image: DecorationImage(
-                                          image: NetworkImage(userDefaultImage),
-                                          fit: BoxFit.cover)),
-                                )
-                              : Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 0, color: Color(0x00ffffff)),
-                                      borderRadius: BorderRadius.circular(1000),
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                              url + talks[index][5]),
-                                          fit: BoxFit.cover)),
-                                ),
+                          GestureDetector(
+                            onTap: () {
+                              if (talks[index][3] == myId) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyHomePage(
+                                        page: 2,
+                                      ),
+                                    ));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OtherPerfil(
+                                        idFr: talks[index][3],
+                                      ),
+                                    ));
+                              }
+                            },
+                            child: talks[index][5] == ""
+                                ? Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 0, color: Color(0x00ffffff)),
+                                        borderRadius:
+                                            BorderRadius.circular(1000),
+                                        image: DecorationImage(
+                                            image:
+                                                NetworkImage(userDefaultImage),
+                                            fit: BoxFit.cover)),
+                                  )
+                                : Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 0, color: Color(0x00ffffff)),
+                                        borderRadius:
+                                            BorderRadius.circular(1000),
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                url + talks[index][5]),
+                                            fit: BoxFit.cover)),
+                                  ),
+                          ),
                           Container(
                             padding: EdgeInsets.all(4),
                             // color: Color(0xfff0f0f6),
@@ -598,60 +636,19 @@ class _Comments extends State<Comments> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            height: 50,
-                            width: MediaQuery.of(context).size.width,
-                            child: TextField(
-                              controller: emojicon,
-                              decoration: new InputDecoration(
-                                hintText: 'Digite aqui...',
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.grey, width: 1.0),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 200,
-                            width: MediaQuery.of(context).size.width,
-                            child: CustomScrollView(
-                              semanticChildCount: emojis.length,
-                              slivers: <Widget>[
-                                SliverGrid(
-                                  gridDelegate:
-                                      SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent: 50.0,
-                                    mainAxisSpacing: 4.0,
-                                    crossAxisSpacing: 4.0,
-                                    childAspectRatio: 1.0,
-                                  ),
-                                  delegate: SliverChildBuilderDelegate(
-                                    (BuildContext context, int index) {
-                                      return filter == null || filter == ""
-                                          ? MaterialButton(
-                                              child:
-                                                  Text(emojis[index]["emoji"]),
-                                              onPressed: () {
-                                                addEmoji(index);
-                                              },
-                                            )
-                                          : emojis[index]['name']
-                                                  .contains(filter)
-                                              ? MaterialButton(
-                                                  child: Text(
-                                                      emojis[index]["emoji"]),
-                                                  onPressed: () {
-                                                    addEmoji(index);
-                                                  },
-                                                )
-                                              : Container();
-                                    },
-                                    childCount: emojis.length,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                              height: 200,
+                              child: PageView(
+                                children: <Widget>[
+                                  emox.emoGro1(),
+                                  emox.emoGro2(),
+                                  emox.emoGro3(),
+                                  emox.emoGro4(),
+                                  emox.emoGro5(),
+                                  emox.emoGro6(),
+                                  emox.emoGro7(),
+                                  emox.emoGro8(),
+                                ],
+                              ))
                         ],
                       ),
                     ),

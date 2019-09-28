@@ -1,37 +1,311 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vupy/bottomAll.dart';
+import 'package:vupy/widgets/url.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
 
 class Settings extends StatefulWidget {
-  Settings({Key key}) : super(key: key);
+  Settings({
+    Key key, 
+    this.navcolor, 
+    this.btn, 
+    this.returnPage = 0,
+
+  }) : super(key: key);
+
+  final Color navcolor;
+  final Color btn;
+  final int returnPage;
 
   @override
   State createState() => _Settings();
 }
 
 class _Settings extends State<Settings> {
+  Color c = Color.fromRGBO(255, 255, 255, 1);
+  Color cp = Color(0xffffffff);
+  
+  Color btncp = Color(0xffffffff);
+  Color btnc = Color.fromRGBO(255, 255, 255, 1);
+
+  Color differ = Color(0xffffffff);
+  Color differBtn = Color(0xffffffff);
+
+  List colorsR;
+
+  String url = URL().getUrl();
+
+  void gets() async {
+    if (widget.navcolor != null) {
+      c = widget.navcolor;
+      cp = widget.navcolor;
+      print(cp.computeLuminance());
+      if (cp.computeLuminance() > 0.673) {
+        differ = Colors.black;
+      } else {
+        differ = Colors.white;
+      }
+    }
+
+    if (widget.btn != null) {
+      btnc = widget.btn;
+      btncp = widget.btn;
+      print(btncp.computeLuminance());
+      if (btncp.computeLuminance() > 0.673) {
+        differBtn = Colors.black;
+      } else {
+        differBtn = Colors.white;
+      }
+    }
+
+    if (this.mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    gets();
+    super.initState();
+  }
+
+  void styles() async {
+    var prefs = await SharedPreferences.getInstance();
+    var jsona = {};
+
+    jsona['user'] = prefs.getInt('userid') ?? 0;
+    jsona['api'] = prefs.getString("api") ?? '';
+
+    var colorCodeRBGA = "rgba(" +
+      cp.red.toString() +
+      "," +
+      cp.green.toString() +
+      "," +
+      cp.blue.toString() +
+      ",1)";
+
+    jsona['navcolor'] = colorCodeRBGA;
+
+    colorCodeRBGA = "rgba(" +
+      btncp.red.toString() +
+      "," +
+      btncp.green.toString() +
+      "," +
+      btncp.blue.toString() +
+      ",1)";
+
+    jsona['themecolor'] = colorCodeRBGA;
+    
+    prefs.setStringList(
+        "color", [cp.red.toString(), cp.green.toString(), cp.blue.toString()]);
+      
+    prefs.setStringList(
+        "colorbtn", [btncp.red.toString(), btncp.green.toString(), btncp.blue.toString()]);
+
+    await http.post(Uri.encodeFull(url + "/workserver/changeSty/"),
+        body: json.encode(jsona));
+  }
+
+  void changeColor(Color color) {
+    setState(() {
+      c = color;
+    });
+  }
+
+  void changeColorBtn(Color color) {
+    setState(() {
+      btnc = color;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: new Center(child: Text('Configurações')),
+        backgroundColor: cp,
+        centerTitle: true,
+        title: Text('Configurações', style: TextStyle(color: differ)),
+        leading: IconButton(
+          icon: Icon(IconData(0xe913, fontFamily: "icomoon"), color: differ),
+          onPressed: () {
+            styles();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  page: widget.returnPage,
+                )
+              )
+            );
+          },
+        ),
       ),
-      body: Center(
-        child: ButtonTheme(
-            height: 50.0,
-            minWidth: 400.0,
-            child: RaisedButton(
-              onPressed: () async {
-                var prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-                Navigator.pushReplacementNamed(context, '/log');
-              },
-              child: Text("Sair", style: TextStyle(color: Colors.white)),
-              color: vupycolor,
-            )),
-      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            leading: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xffC1C6C9),width: 2),
+                borderRadius: BorderRadius.circular(100)
+              ),
+              child: CircleAvatar(
+                backgroundColor: cp,
+              ),
+            ),
+            title: Text("Trocar cor do menu"),
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Escolha um cor!'),
+                    content: SingleChildScrollView(
+                      child: ColorPicker(
+                        pickerColor: c,
+                        onColorChanged: changeColor,
+                        enableLabel: true,
+                        displayThumbColor: false,
+                        enableAlpha: false,
+                        pickerAreaHeightPercent: 0.8,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: const Text('Trocar'),
+                        onPressed: () async {
+                          if (this.mounted) {
+                            setState(() {
+                              cp = c;
+                              if (c.computeLuminance() > 0.673) {
+                                differ = Colors.black;
+                              } else {
+                                differ = Colors.white;
+                              }
+                            });
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xffC1C6C9),width: 2),
+                borderRadius: BorderRadius.circular(100)
+              ),
+              child: CircleAvatar(
+                backgroundColor: btncp,
+              ),
+            ),
+            title: Text("Trocar cor dos botoẽs"),
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Escolha um cor!'),
+                    content: SingleChildScrollView(
+                      child: ColorPicker(
+                        pickerColor: btnc,
+                        onColorChanged: changeColorBtn,
+                        enableLabel: true,
+                        displayThumbColor: false,
+                        enableAlpha: false,
+                        pickerAreaHeightPercent: 0.8,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: const Text('Trocar'),
+                        onPressed: () async {
+                          if (this.mounted) {
+                            setState(() {
+                              btncp = btnc;
+                              if (btnc.computeLuminance() > 0.673) {
+                                differBtn = Colors.black;
+                              } else {
+                                differBtn = Colors.white;
+                              }
+                            });
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+
+          ListTile(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (context){
+                  return AlertDialog(
+                    title: Text("Deseja sair da conta."),
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      // crossAxisAlignment: croa,
+                      children: <Widget>[
+                        MaterialButton(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+
+                          child: Text("Sim", style: TextStyle(color: differBtn)),
+                          onPressed: () async {
+                            var prefs = await SharedPreferences.getInstance();
+                            prefs.clear();
+                            Navigator.pushReplacementNamed(context, "/log");
+                          },
+                          color: btncp,
+                        ),
+                        MaterialButton(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          child: Text("Não", style: TextStyle(color: differBtn)),
+                          onPressed: () async {
+                            Navigator.pop(context);
+                          },
+                          color: btncp,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              );
+            },
+            title: Text("Sair da conta."),
+            leading: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xffC1C6C9),width: 2),
+                borderRadius: BorderRadius.circular(100)
+              ),
+              child: CircleAvatar(
+                backgroundColor: Color(0x01000001),
+                foregroundColor: Colors.blueGrey,
+                child: Icon(IconData(0xe98f, fontFamily: "icomoon")),
+              ),
+            ),
+            
+            
+            
+          )
+        ],
+      )
     );
   }
 }

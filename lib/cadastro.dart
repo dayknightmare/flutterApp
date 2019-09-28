@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:vupy/widgets/url.dart';
+
 const vupycolor = Color(0xFFE7002A);
 
 class Createpage extends StatefulWidget {
@@ -17,7 +19,7 @@ class _Createpage extends State<Createpage> {
   final password2 = TextEditingController();
 
   int iduser;
-  String apicad;
+  String apicad, url = URL().getUrl();
 
   void cadastro(String url, Map body) async {
     var jsona = {};
@@ -29,7 +31,7 @@ class _Createpage extends State<Createpage> {
     var r = await http.post(Uri.encodeFull(url), body: json.encode(jsona));
     var resposta = json.decode(r.body);
 
-    print(resposta);
+    
 
     List<Widget> errors = new List<Widget>();
     for (var i in resposta['resposta']) {
@@ -134,7 +136,7 @@ class _Createpage extends State<Createpage> {
                           data['email'] = email.text;
 
                           cadastro(
-                              'http://179.233.213.76/workserver/signup/', data);
+                              url + '/workserver/signup/', data);
                         }
                       }
                     },

@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:vupy/widgets/url.dart';
+
 const vupycolor = Color(0xFFE7002A);
 
 class Loginpage extends StatefulWidget {
@@ -16,7 +18,7 @@ class _Loginpage extends State<Loginpage> {
   final userF = TextEditingController();
 
   int iduser;
-  String apicad, url = "http://179.233.213.76";
+  String apicad, url = URL().getUrl();
 
   Future<String> login(String url, Map body) async {
     var jsona = {};

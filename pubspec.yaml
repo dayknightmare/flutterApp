@@ -23,7 +23,8 @@ dependencies:
   async:
   shared_preferences: ^0.4.3
   page_transition: '^1.1.0'
-  cupertino_icons: ^0.1.2
+  flutter_colorpicker: any
+  bubble_bottom_bar: ^1.2.0
   flutter:
     sdk: flutter
 
@@ -57,6 +58,13 @@ flutter:
         fonts:
             - asset: fonts/icomoon.ttf
               weight: 400
+      - family: Emojis
+        fonts:
+            - asset: fonts/vupyEmoji.ttf
+      - family: Poppins
+        fonts:
+            - asset: fonts/textFont/Poppins-Regular.ttf
+            - asset: fonts/textFont/Poppins-Medium.ttf
 
   # To add assets to your application, add an assets section, like this:
 

@@ -6,10 +6,13 @@ import 'package:image_cropper/image_cropper.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:vupy/bottomAll.dart';
 
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+
+import 'package:vupy/widgets/url.dart';
 
 class PerfilFtPage extends StatefulWidget {
   @override
@@ -30,7 +33,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
 
   int myId;
   bool changed = false;
-  String url = "http://179.233.213.76",
+  String url = URL().getUrl(),
       api,
       ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png",
       capeuser,
@@ -278,7 +281,11 @@ class _PerfilFtPage extends State<PerfilFtPage> {
               // Navigator.pushNamed(context, '/bottom');
             //  Navigator.pop(context);
             //  Navigator.pus(context, "/bottom");
-              Navigator.pushReplacementNamed(context, '/bottom');            
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  page: 2,
+                ) 
+              ));            
             },
           ),
         ],

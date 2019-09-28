@@ -1,4 +1,3 @@
-import 'dart:core' as prefix0;
 import 'dart:core';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +8,8 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:path/path.dart';
 import 'package:async/async.dart';
+import 'package:vupy/widgets/getColors.dart';
+import 'package:vupy/widgets/url.dart';
 
 import 'dart:convert';
 import 'dart:async';
@@ -16,13 +17,25 @@ import 'dart:io';
 
 import '../comments.dart';
 import '../otherperfil.dart';
+import '../settings.dart';
 
-const vupycolor = const Color(0xFFE7002B);
+import '../widgets/emojis.dart';
+
 const white = const Color(0xFFFFFFFF);
+final publ = TextEditingController();
 
 class HomePageVupy extends StatefulWidget {
   @override
   State createState() => _HomePageVupy();
+}
+
+class Emojis extends EmojisData{
+  Emojis(double media, List emojis) : super(media, emojis);
+
+  @override
+  void addEmoji(emo){
+    publ.text += emo;
+  }
 }
 
 class _HomePageVupy extends State<HomePageVupy> {
@@ -30,17 +43,22 @@ class _HomePageVupy extends State<HomePageVupy> {
 
   bool infor = false, fail = false;
 
-  String image = "", name, api, url = "http://179.233.213.76", filter;
+  String image = "", name, api, url = URL().getUrl(), filter;
+  String ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png";
+
   int myId, ids;
 
   List<Widget> post = new List();
   List talks = [];
-  List emojis = [];
   List duoemojis = [];
+
+  Color trueColor;
+  Color differ = Color(0xffffffff);
+  Color differBtn;
+  Color vupycolor = Color(0xFFE7002B);
 
   TextEditingController emojicon = new TextEditingController();
 
-  final publ = TextEditingController();
 
   File file;
 
@@ -148,7 +166,6 @@ class _HomePageVupy extends State<HomePageVupy> {
       publ.clear();
 
       var response = await request.send();
-      print(response.statusCode);
       if (response.statusCode == 200) {
         if (this.mounted) {
           setState(() {});
@@ -168,10 +185,6 @@ class _HomePageVupy extends State<HomePageVupy> {
     }
   }
 
-  void addEmoji(index) {
-    publ.text = publ.text + emojis[index]["emoji"];
-  }
-
   @override
   void dispose() {
     gnpTime = null;
@@ -179,53 +192,64 @@ class _HomePageVupy extends State<HomePageVupy> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    void startChatPub() async {
-      var jsona = {};
-      var prefs = await SharedPreferences.getInstance();
-      myId = prefs.getInt('userid') ?? 0;
-      api = prefs.getString("api") ?? '';
+  void startChatPub() async {
+    var jsona = {};
+    var prefs = await SharedPreferences.getInstance();
 
-      jsona["user"] = myId;
-      jsona["api"] = api;
+    myId = prefs.getInt('userid') ?? 0;
+    api = prefs.getString("api") ?? '';
 
-      var r = await http.post(Uri.encodeFull(url + '/workserver/getinit/'),
-          body: json.encode(jsona));
-      var resposta = json.decode(r.body);
+    if (this.mounted) {
+      setState(() {
+        var color = (prefs.getStringList("color") ?? ["255", "255", "255", "1"])
+            .toList()
+            .toString();
+        var cc = jsonDecode(color);
+        trueColor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
 
-      talks.addAll(resposta["resposta"]);
-      ids = resposta["lsd"];
-      name = resposta['name'];
-
-      duoemojis =
-          json.decode(await rootBundle.loadString('assets/json/finish.json'));
-
-      emojis.addAll(duoemojis);
-      if (this.mounted) {
-        setState(() {});
-      }
+        color = (prefs.getStringList("colorbtn") ?? ["231", "0", "42", "1"])
+            .toList()
+            .toString();
+        cc = jsonDecode(color);
+        vupycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+      });
     }
 
+    jsona["user"] = myId;
+    jsona["api"] = api;
+
+    var r = await http.post(Uri.encodeFull(url + '/workserver/getinit/'),
+        body: json.encode(jsona));
+
+    var resposta = json.decode(r.body);
+
+    talks.addAll(resposta["resposta"]);
+    ids = resposta["lsd"];
+    name = resposta['name'];
+
+    duoemojis =
+        json.decode(await rootBundle.loadString('assets/json/finish.json'));
+
+    Future colorsnav = ColorsGetCustom().getColorNavAndBtn(
+        resposta['navcolor'], trueColor, resposta['themecolor'], vupycolor);
+
+    colorsnav.then((response) {
+      print(response[2]);
+      trueColor = response[0];
+      differ = response[1];
+      vupycolor = response[2];
+      differBtn = response[3];
+    });
+    if (this.mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
     focusPubl.addListener(changeFocusPubl);
     startChatPub();
     gnpTime = new Timer(const Duration(seconds: 2), gnp);
-    emojicon.addListener(() {
-      filter = emojicon.text;
-      setState(() {
-        emojis.clear();
-
-        if (filter != null || filter != "") {
-          for (var i = 0; i < duoemojis.length; i++) {
-            if (duoemojis[i]['name'].contains(filter)) {
-              emojis.add(duoemojis[i]);
-            }
-          }
-        } else {
-          emojis.addAll(duoemojis);
-        }
-      });
-    });
     super.initState();
   }
 
@@ -244,213 +268,195 @@ class _HomePageVupy extends State<HomePageVupy> {
     context,
   ) {
     return Container(
-      decoration: new BoxDecoration(
-        color: Colors.white,
-        border: new Border.all(
-          width: 0.0,
-          color: const Color(0x00000000),
-        ),
-        borderRadius: new BorderRadius.circular(5.0),
-        boxShadow: [
-          new BoxShadow(
-            color: const Color(0x23000000),
-            blurRadius: 4.0,
-          )
-        ],
-      ),
-      margin: const EdgeInsets.only(top: 10.0),
+      decoration: BoxDecoration(color: Colors.white),
+      margin: EdgeInsets.only(top: 10),
       child: Column(
-        children: [
+        children: <Widget>[
           talks[2] != "" ? Image.network(url + talks[2]) : Container(),
-          Container(
-            padding: new EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                Container(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OtherPerfil(
+                          idFr: talks[1],
+                        ),
+                      ));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(left: 5, top: 5),
                   child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OtherPerfil(
-                                      idFr: talks[1],
-                                    ),
-                                  ));
-                            },
-                            child: Row(
-                              children: [
-                                talks[6] != ""
-                                    ? Container(
-                                        margin:
-                                            const EdgeInsets.only(right: 5.0),
-                                        child: new ClipRRect(
-                                          borderRadius:
-                                              new BorderRadius.circular(50.0),
-                                          child: Image.network(
-                                            url + talks[6],
-                                            height: 40.0,
-                                            width: 40.0,
-                                          ),
-                                        ))
-                                    : Text(''),
-                                Text(talks[5],
-                                    style: new TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                              ],
-                            ),
-                          )),
-                      talks[1] == myId
-                          ? GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text(
-                                          'Você deseja remover essa publicação.'),
-                                      content: SingleChildScrollView(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: <Widget>[
-                                            ButtonTheme(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8)),
-                                                child: RaisedButton(
-                                                  onPressed: () {
-                                                    deletePub(talks[0], index);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Text("Sim",
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              0xFFFFFFFF))),
-                                                  color: vupycolor,
-                                                )),
-                                            ButtonTheme(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8)),
-                                                child: RaisedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Text("Não",
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              0xFFFFFFFF))),
-                                                  color: vupycolor,
-                                                )),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: Container(
-                                padding: new EdgeInsets.all(5.0),
-                                margin: const EdgeInsets.only(right: 5.0),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text("X"),
-                                ),
-                              ),
+                    children: <Widget>[
+                      talks[6] != ""
+                          ? Container(
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 5.0),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0x01000001)),
+                                  borderRadius: BorderRadius.circular(100),
+                                  image: DecorationImage(
+                                      image: NetworkImage(url + talks[6]),
+                                      fit: BoxFit.cover)),
                             )
-                          : Text('', style: new TextStyle(fontSize: 1.0)),
+                          : Container(
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 5.0),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Color(0x01000001)),
+                                  borderRadius: BorderRadius.circular(100),
+                                  image: DecorationImage(
+                                      image: NetworkImage(ftuser),
+                                      fit: BoxFit.cover)),
+                            ),
+                      Text(talks[5]),
                     ],
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: talks[6] != ""
-                      ? Container(
-                          margin: const EdgeInsets.only(left: 45.0),
-                          child: Text(talks[4]),
-                        )
-                      : Container(
-                          margin: const EdgeInsets.only(left: 0.0),
-                          child: Text(talks[4]),
-                        ),
-                ),
-                Divider(color: Color(0x00FFFFFF)),
-                Container(
-                  margin: const EdgeInsets.only(top: 8.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: talks[3] != ""
-                        ? Text(talks[3])
-                        : Text('', style: new TextStyle(fontSize: 1.0)),
-                  ),
-                ),
-                Divider(color: Color(0xFFd2d2d2)),
-                Container(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        talks[7] == 0
-                            ? GestureDetector(
-                                onTap: () async {
-                                  talks[7] = 1;
-                                  likeMe(index, talks[0]);
-                                },
-                                child: Icon(
-                                  IconData(0xe97c, fontFamily: 'icomoon'),
-                                  size: 20,
-                                  color: Colors.grey,
-                                ))
-                            : GestureDetector(
-                                onTap: () async {
-                                  talks[7] = 0;
-                                  likeMe(index, talks[0]);
-                                },
-                                child: new IconTheme(
-                                  data: new IconThemeData(color: vupycolor),
-                                  child: Icon(
-                                    IconData(0xe900, fontFamily: 'icomoon'),
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                        GestureDetector(
-                          onTap: () async {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Comments(
-                                    id: talks[0],
-                                    name: talks[5],
-                                    image: talks[6],
-                                    myname: name,
-                                    text: talks[3],
-                                    returnPage: "/bottom",
-                                  ),
-                                ));
-                          },
-                          child: Icon(
-                            IconData(0xe998, fontFamily: 'icomoon'),
+              ),
+              Container(
+                  child: talks[1] == myId
+                      ? IconButton(
+                          icon: Icon(
+                            IconData(0xea10, fontFamily: 'icomoon'),
                             size: 20,
                             color: Colors.grey,
                           ),
-                        ),
-                        Icon(
-                          IconData(0xe9ce, fontFamily: 'icomoon'),
-                          size: 20,
-                          color: Colors.grey,
-                        ),
-                      ]),
-                ),
-              ],
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                      'Você deseja remover essa publicação.'),
+                                  content: SingleChildScrollView(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        MaterialButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          child: Text(
+                                            "Sim",
+                                            style: TextStyle(color: differBtn),
+                                          ),
+                                          onPressed: () {
+                                            deletePub(talks[0], index);
+                                            Navigator.pop(context);
+                                          },
+                                          color: vupycolor,
+                                        ),
+                                        MaterialButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          child: Text(
+                                            "Não",
+                                            style: TextStyle(color: differBtn),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          color: vupycolor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        )
+                      : Container())
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              margin: const EdgeInsets.only(left: 45.0),
+              child: Text(talks[4]),
             ),
+          ),
+          Divider(color: Color(0x00FFFFFF)),
+          Container(
+            margin: const EdgeInsets.only(top: 8.0, left: 45, right: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: talks[3] != "" ? Text(talks[3]) : Container(),
+            ),
+          ),
+          Divider(color: Color(0xFFd2d2d2)),
+          Container(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  talks[7] == 0
+                      ? FlatButton.icon(
+                          icon: Icon(
+                            IconData(0xe97c, fontFamily: 'icomoon'),
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                          label: Text("${talks[8]}"),
+                          onPressed: () {
+                            talks[7] = 1;
+                            likeMe(index, talks[0]);
+                          },
+                        )
+                      : FlatButton.icon(
+                          icon: Icon(
+                            IconData(0xe900, fontFamily: 'icomoon'),
+                            size: 20,
+                            color: vupycolor,
+                          ),
+                          label: Text("${talks[8]}"),
+                          onPressed: () {
+                            talks[7] = 0;
+                            likeMe(index, talks[0]);
+                          },
+                        ),
+                  FlatButton.icon(
+                    icon: Icon(
+                      IconData(0xe998, fontFamily: 'icomoon'),
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    label: Text("${talks[10]}"),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Comments(
+                              id: talks[0],
+                              name: talks[5],
+                              image: talks[6],
+                              myname: name,
+                              text: talks[3],
+                              returnPage: "/bottom",
+                              btn: vupycolor,
+                              differBtn: differBtn,
+                              differNav: differ,
+                              nav: trueColor,
+                            ),
+                          ));
+                    },
+                  ),
+                  FlatButton.icon(
+                    icon: Icon(
+                      IconData(0xe9ce, fontFamily: 'icomoon'),
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    label: Text("${talks[9]}"),
+                    onPressed: () {},
+                  )
+                ]),
           ),
         ],
       ),
@@ -459,6 +465,7 @@ class _HomePageVupy extends State<HomePageVupy> {
 
   @override
   Widget build(BuildContext context) {
+    Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
     return Stack(
       children: [
         CustomScrollView(
@@ -466,17 +473,26 @@ class _HomePageVupy extends State<HomePageVupy> {
           slivers: <Widget>[
             SliverAppBar(
               floating: true,
-              title: Text('Publicações'),
-              backgroundColor: Colors.white,
+              title: Text(
+                'Publicações',
+                style: TextStyle(color: differ),
+              ),
+              backgroundColor: trueColor,
               centerTitle: true,
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(IconData(0xe98f, fontFamily: 'icomoon'),
-                      color: Colors.black),
+                  icon: Icon(
+                    IconData(0xe9cd, fontFamily: 'icomoon'),
+                    color: differ,
+                  ),
                   onPressed: () async {
-                    var prefs = await SharedPreferences.getInstance();
-                    prefs.clear();
-                    Navigator.pushReplacementNamed(context, '/log');
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Settings(
+                                  navcolor: trueColor,
+                                  btn: vupycolor,
+                                )));
                   },
                 ),
               ],
@@ -534,7 +550,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                           IconData(0xe92b,
                                               fontFamily: "icomoon"),
                                           size: 20.0,
-                                          color: Colors.white),
+                                          color: differBtn),
                                       onPressed: () {
                                         showDialog(
                                           context: context,
@@ -559,7 +575,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                       },
                                                       child: Text("Galeria"),
                                                       color: vupycolor,
-                                                      textColor: white,
+                                                      textColor: differBtn,
                                                     ),
                                                     MaterialButton(
                                                       shape:
@@ -574,7 +590,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                       },
                                                       child: Text("Camera"),
                                                       color: vupycolor,
-                                                      textColor: white,
+                                                      textColor: differBtn,
                                                     )
                                                   ],
                                                 ),
@@ -599,7 +615,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                           IconData(0xe9dc,
                                               fontFamily: "icomoon"),
                                           size: 20.0,
-                                          color: Colors.white),
+                                          color: differBtn),
                                       onPressed: () {
                                         if (_visible) {
                                           _visible = false;
@@ -628,7 +644,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                                     onPressed: () {
                                       postPub();
                                     },
-                                    textColor: white,
+                                    textColor: differBtn,
                                     color: vupycolor,
                                   )),
                             ],
@@ -699,58 +715,20 @@ class _HomePageVupy extends State<HomePageVupy> {
                     child: Column(
                       children: <Widget>[
                         Container(
-                          height: 50,
-                          width: MediaQuery.of(context).size.width,
-                          child: TextField(
-                            controller: emojicon,
-                            decoration: new InputDecoration(
-                              hintText: 'Digite aqui...',
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 1.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
                           height: 200,
-                          width: MediaQuery.of(context).size.width,
-                          child: CustomScrollView(
-                            semanticChildCount: emojis.length,
-                            slivers: <Widget>[
-                              SliverGrid(
-                                gridDelegate:
-                                    SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 50.0,
-                                  mainAxisSpacing: 4.0,
-                                  crossAxisSpacing: 4.0,
-                                  childAspectRatio: 1.0,
-                                ),
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return filter == null || filter == ""
-                                        ? MaterialButton(
-                                            child: Text(emojis[index]["emoji"]),
-                                            onPressed: () {
-                                              addEmoji(index);
-                                            },
-                                          )
-                                        : emojis[index]['name'].contains(filter)
-                                            ? MaterialButton(
-                                                child: Text(
-                                                    emojis[index]["emoji"]),
-                                                onPressed: () {
-                                                  addEmoji(index);
-                                                },
-                                              )
-                                            : Container();
-                                  },
-                                  childCount: emojis.length,
-                                ),
-                              ),
+                          child: PageView(
+                            children: <Widget>[
+                              emox.emoGro1(),
+                              emox.emoGro2(),
+                              emox.emoGro3(),
+                              emox.emoGro4(),
+                              emox.emoGro5(),
+                              emox.emoGro6(),
+                              emox.emoGro7(),
+                              emox.emoGro8(),
                             ],
-                          ),
-                        ),
+                          )
+                        )
                       ],
                     ),
                   ),

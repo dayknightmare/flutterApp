@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:vupy/widgets/getColors.dart';
+import 'package:vupy/widgets/url.dart';
 
 import './widgets/postCard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,13 +17,19 @@ class OtherPerfil extends StatefulWidget {
 
 class _OtherPerfil extends State<OtherPerfil> {
   int myId;
-  String url = "http://179.233.213.76",
+  String url = URL().getUrl(),
       api,
       ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png",
       capeuser,
       name = '',
       myname;
   List talks = [];
+
+  Color trueColor;
+  Color differ = Color(0xffffffff);
+
+  Color trueColorBtn;
+  Color differBtn = Color(0xffffffff);
 
   void getP() async {
     var jsona = {};
@@ -34,9 +42,12 @@ class _OtherPerfil extends State<OtherPerfil> {
     jsona["api"] = api;
     jsona["guy"] = widget.idFr;
 
-    var r = await http.post(Uri.encodeFull(url + "/workserver/getiOtherProfile/"),
+    var r = await http.post(
+        Uri.encodeFull(url + "/workserver/getiOtherProfile/"),
         body: json.encode(jsona));
+
     var resposta = json.decode(r.body);
+
     if (resposta['style'][1] == null || resposta['style'][1] == "") {
       ftuser = url + "/static/img/user.png";
     } else {
@@ -48,16 +59,31 @@ class _OtherPerfil extends State<OtherPerfil> {
     } else {
       capeuser = url + "/media" + resposta['style'][0];
     }
+
     talks = resposta['talks'];
     name = resposta['name'];
     myname = resposta['myname'];
+
+    Future colorsnavs = ColorsGetCustom().getColorNavAndBtn(
+      resposta['style'][2],
+      Color(0xffffffff),
+      resposta['style'][3],
+      Color(0xffe7002a),
+      you: 1,
+    );
+
+    colorsnavs.then((response) {
+      trueColor = response[0];
+      differ = response[1];
+      trueColorBtn = response[2];
+      differBtn = response[3];
+    });
 
     setState(() {});
   }
 
   @override
   void initState() {
-    print("object2");
     void lets() async {
       getP();
     }
@@ -68,13 +94,13 @@ class _OtherPerfil extends State<OtherPerfil> {
 
   @override
   void dispose() {
-    print("object");
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0Xffe6ecf0),
       body: Stack(
         children: <Widget>[
           CustomScrollView(
@@ -82,15 +108,18 @@ class _OtherPerfil extends State<OtherPerfil> {
             slivers: <Widget>[
               SliverAppBar(
                 floating: true,
-                title: Text(name),
+                title: Text(
+                  name,
+                  style: TextStyle(color: differ),
+                ),
                 centerTitle: true,
-                backgroundColor: Colors.white,
+                backgroundColor: trueColor,
                 leading: IconButton(
                   icon: Icon(
                     IconData(0xe913, fontFamily: 'icomoon'),
-                    color: Colors.black,
+                    color: differ,
                   ),
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
@@ -116,13 +145,13 @@ class _OtherPerfil extends State<OtherPerfil> {
                           padding: EdgeInsets.symmetric(
                               vertical: (MediaQuery.of(context).size.width /
                                           1.7777777777777777 -
-                                      MediaQuery.of(context).size.width / 2.4) /
+                                      MediaQuery.of(context).size.width / 3) /
                                   2),
                           child: Column(
                             children: <Widget>[
                               Container(
-                                width: MediaQuery.of(context).size.width / 2.4,
-                                height: MediaQuery.of(context).size.width / 2.4,
+                                width: MediaQuery.of(context).size.width / 3,
+                                height: MediaQuery.of(context).size.width / 3,
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         width: 0, color: Color(0x01000001)),
@@ -131,10 +160,10 @@ class _OtherPerfil extends State<OtherPerfil> {
                                   borderRadius: BorderRadius.circular(100),
                                   child: Image.network(ftuser,
                                       width: MediaQuery.of(context).size.width /
-                                          2.4,
+                                          3,
                                       height:
                                           MediaQuery.of(context).size.width /
-                                              2.4),
+                                              3),
                                 ),
                               ),
                             ],
@@ -174,6 +203,10 @@ class _OtherPerfil extends State<OtherPerfil> {
                       api: api,
                       name: myname,
                       returnPage: "/perfil",
+                      btn: trueColorBtn,
+                      differBtn: differBtn,
+                      differNav: differ,
+                      nav: trueColor,
                     );
                   },
                   childCount: talks.length,

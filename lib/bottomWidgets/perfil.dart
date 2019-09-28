@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:vupy/settings.dart';
+import 'package:vupy/widgets/getColors.dart';
+import 'package:vupy/widgets/url.dart';
 
 import '../widgets/postCard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,12 +18,21 @@ class Perfil extends StatefulWidget {
 
 class _Perfil extends State<Perfil> {
   int myId;
-  String url = "http://179.233.213.76",
+
+  String url = URL().getUrl(),
       api,
       ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png",
       capeuser,
       name = '';
+
   List talks = [];
+
+  Color trueColor;
+  Color differ = Color(0xffffffff);
+
+  Color trueColorBtn;
+  Color differBtn = Color(0xffffffff);
+
 
   void getP() async {
     var jsona = {};
@@ -28,8 +40,21 @@ class _Perfil extends State<Perfil> {
     myId = prefs.getInt('userid') ?? 0;
     api = prefs.getString("api") ?? '';
 
+    if (this.mounted) {
+      setState(() {
+        var color = (prefs.getStringList("color") ?? ["255","255","255","1"]).toList().toString();
+        var cc = jsonDecode(color);
+        trueColor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+
+        color = (prefs.getStringList("colorbtn") ?? ["231","0","42","1"]).toList().toString();
+        cc = jsonDecode(color);
+        trueColorBtn = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+      });
+    }
+    
     jsona["user"] = myId;
     jsona["api"] = api;
+    
     var r = await http.post(Uri.encodeFull(url + "/workserver/getiProfile/"),
         body: json.encode(jsona));
     var resposta = json.decode(r.body);
@@ -44,25 +69,40 @@ class _Perfil extends State<Perfil> {
     } else {
       capeuser = url + "/media" + resposta['style'][0];
     }
+
     talks = resposta['talks'];
     name = resposta['name'];
-    setState(() {});
+
+    Future colorsnavs = ColorsGetCustom().getColorNavAndBtn(
+      resposta['navcolor'],
+      trueColor,
+      resposta['themecolor'],
+      trueColorBtn
+    );
+
+    colorsnavs.then((response){
+      trueColor = response[0];
+      differ = response[1];
+      trueColorBtn = response[2];
+      differBtn = response[3];
+    });
+
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void initState() {
-    print("object2");
     void lets() async {
       getP();
     }
-
     lets();
     super.initState();
   }
 
   @override
   void dispose() {
-    print("object");
     super.dispose();
   }
 
@@ -75,26 +115,31 @@ class _Perfil extends State<Perfil> {
           slivers: <Widget>[
             SliverAppBar(
               floating: true,
-              title: Text("Perfil"),
+              title: Text("Perfil", style: TextStyle(color: differ)),
               centerTitle: true,
-              backgroundColor: Colors.white,
+              backgroundColor: trueColor,
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(IconData(0xe98f, fontFamily: 'icomoon'),
-                      color: Colors.black),
+                  icon: Icon(IconData(0xe9cd, fontFamily: 'icomoon'),color: differ,),
                   onPressed: () async {
-                    var prefs = await SharedPreferences.getInstance();
-                    prefs.clear();
-                    Navigator.pushReplacementNamed(context, '/log');
+                    Navigator.pushReplacement(context,
+                    MaterialPageRoute(
+                      builder: (context) => Settings(
+                        navcolor: trueColor,
+                        btn: trueColorBtn,
+                        returnPage: 2,
+                      )
+                    ));
                   },
                 ),
               ],
               leading: IconButton(
-                icon: Icon(IconData(0xe95d, fontFamily: 'icomoon'),
-                    color: Colors.black),
+                icon: Icon(
+                  IconData(0xe95d, fontFamily: 'icomoon'),
+                  color: differ,
+                ),
                 onPressed: () async {
                   Navigator.pushNamed(context, "/perfilFt");
-                  // Navigator.push(context, route)
                 },
               ),
             ),
@@ -119,13 +164,13 @@ class _Perfil extends State<Perfil> {
                         padding: EdgeInsets.symmetric(
                             vertical: (MediaQuery.of(context).size.width /
                                         1.7777777777777777 -
-                                    MediaQuery.of(context).size.width / 2.4) /
+                                    MediaQuery.of(context).size.width / 3) /
                                 2),
                         child: Column(
                           children: <Widget>[
                             Container(
-                              width: MediaQuery.of(context).size.width / 2.4,
-                              height: MediaQuery.of(context).size.width / 2.4,
+                              width: MediaQuery.of(context).size.width / 3,
+                              height: MediaQuery.of(context).size.width / 3,
                               decoration: BoxDecoration(
                                   border: Border.all(
                                       width: 0, color: Color(0x01000001)),
@@ -134,9 +179,9 @@ class _Perfil extends State<Perfil> {
                                 borderRadius: BorderRadius.circular(100),
                                 child: Image.network(ftuser,
                                     width:
-                                        MediaQuery.of(context).size.width / 2.4,
+                                        MediaQuery.of(context).size.width / 3,
                                     height: MediaQuery.of(context).size.width /
-                                        2.4),
+                                        3),
                               ),
                             ),
                           ],
@@ -156,7 +201,7 @@ class _Perfil extends State<Perfil> {
                         ),
                       ),
                       Divider(
-                        color: Color(0Xffe6ecf0),
+                        color: Color(0X01000001),
                       ),
                     ],
                   ),
@@ -176,6 +221,10 @@ class _Perfil extends State<Perfil> {
                     api: api,
                     name: name,
                     returnPage: "/perfil",
+                    btn: trueColorBtn,
+                    differBtn: differBtn,
+                    differNav: differ,
+                    nav: trueColor,
                   );
                 },
                 childCount: talks.length,

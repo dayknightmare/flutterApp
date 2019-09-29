@@ -39,11 +39,11 @@ class Comments extends StatefulWidget {
   State createState() => _Comments();
 }
 
-class Emojis extends EmojisData{
+class Emojis extends EmojisData {
   Emojis(double media, List emojis) : super(media, emojis);
 
   @override
-  void addEmoji(emo){
+  void addEmoji(emo) {
     commCon.text += emo;
   }
 }
@@ -180,6 +180,15 @@ class _Comments extends State<Comments> {
     }
   }
 
+  void changeFocus() {
+    if (focusComm.hasFocus.toString() == "true") {
+      _visible = false;
+      if (this.mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   void initState() {
     name = widget.name;
@@ -192,13 +201,13 @@ class _Comments extends State<Comments> {
     differBtn = widget.differBtn;
     differNav = widget.differNav;
     nav = widget.nav;
+    focusComm.addListener(changeFocus);
     startComm();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
     Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
 
     return Scaffold(
@@ -305,8 +314,7 @@ class _Comments extends State<Comments> {
                                           const EdgeInsets.all(15.0),
                                       focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Color(0xffC1C6C9),
-                                            width: 1.5),
+                                            color: Colors.black, width: 1.5),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -636,19 +644,40 @@ class _Comments extends State<Comments> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                              height: 200,
-                              child: PageView(
-                                children: <Widget>[
-                                  emox.emoGro1(),
-                                  emox.emoGro2(),
-                                  emox.emoGro3(),
-                                  emox.emoGro4(),
-                                  emox.emoGro5(),
-                                  emox.emoGro6(),
-                                  emox.emoGro7(),
-                                  emox.emoGro8(),
-                                ],
-                              ))
+                            height: 250,
+                            child: DefaultTabController(
+                              length: 8,
+                              child: Scaffold(
+                                appBar: TabBar(
+                                  labelColor: Colors.black,
+                                  indicatorColor: vupycolor,
+                                  unselectedLabelColor: Colors.grey,
+                                  tabs: <Widget>[
+                                    Tab(text: "😀"),
+                                    Tab(text: "🐶"),
+                                    Tab(text: "🥯"),
+                                    Tab(text: "🎮"),
+                                    Tab(text: "⚽️"),
+                                    Tab(text: "🌍"),
+                                    Tab(text: "💯"),
+                                    Tab(text: "🏴"),
+                                  ],
+                                ),
+                                body: TabBarView(
+                                  children: <Widget>[
+                                    emox.emoGro1(),
+                                    emox.emoGro2(),
+                                    emox.emoGro3(),
+                                    emox.emoGro4(),
+                                    emox.emoGro5(),
+                                    emox.emoGro6(),
+                                    emox.emoGro7(),
+                                    emox.emoGro8(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),

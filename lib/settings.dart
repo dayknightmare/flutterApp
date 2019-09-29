@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import 'package:flutter/material.dart';
@@ -79,10 +77,13 @@ class _Settings extends State<Settings> {
 
   void styles() async {
     var prefs = await SharedPreferences.getInstance();
-    var jsona = {};
 
-    jsona['user'] = prefs.getInt('userid') ?? 0;
-    jsona['api'] = prefs.getString("api") ?? '';
+    var uri = Uri.parse(url + "/workserver/changeSty/");
+    var request = new http.MultipartRequest("POST", uri);
+
+    request.fields['api'] = prefs.getString("api") ?? '';
+    request.fields['user'] = (prefs.getInt('userid') ?? 0).toString();
+    request.fields['private'] = (-1).toString();
 
     var colorCodeRBGA = "rgba(" +
       cp.red.toString() +
@@ -92,7 +93,7 @@ class _Settings extends State<Settings> {
       cp.blue.toString() +
       ",1)";
 
-    jsona['navcolor'] = colorCodeRBGA;
+    request.fields['navcolor'] = colorCodeRBGA;
 
     colorCodeRBGA = "rgba(" +
       btncp.red.toString() +
@@ -102,7 +103,7 @@ class _Settings extends State<Settings> {
       btncp.blue.toString() +
       ",1)";
 
-    jsona['themecolor'] = colorCodeRBGA;
+    request.fields['themecolor'] = colorCodeRBGA;
     
     prefs.setStringList(
         "color", [cp.red.toString(), cp.green.toString(), cp.blue.toString()]);
@@ -110,8 +111,12 @@ class _Settings extends State<Settings> {
     prefs.setStringList(
         "colorbtn", [btncp.red.toString(), btncp.green.toString(), btncp.blue.toString()]);
 
-    await http.post(Uri.encodeFull(url + "/workserver/changeSty/"),
-        body: json.encode(jsona));
+    var response = await request.send();
+      if (response.statusCode == 200) {
+        if (this.mounted) {
+          setState(() {});
+        }
+      }
   }
 
   void changeColor(Color color) {

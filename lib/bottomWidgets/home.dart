@@ -715,20 +715,40 @@ class _HomePageVupy extends State<HomePageVupy> {
                     child: Column(
                       children: <Widget>[
                         Container(
-                          height: 200,
-                          child: PageView(
-                            children: <Widget>[
-                              emox.emoGro1(),
-                              emox.emoGro2(),
-                              emox.emoGro3(),
-                              emox.emoGro4(),
-                              emox.emoGro5(),
-                              emox.emoGro6(),
-                              emox.emoGro7(),
-                              emox.emoGro8(),
-                            ],
+                            height: 250,
+                            child: DefaultTabController(
+                              length: 8,
+                              child: Scaffold(
+                                appBar: TabBar(
+                                  labelColor: Colors.black,
+                                  indicatorColor: vupycolor,
+                                  unselectedLabelColor: Colors.grey,
+                                  tabs: <Widget>[
+                                    Tab(text: "😀"),
+                                    Tab(text: "🐶"),
+                                    Tab(text: "🥯"),
+                                    Tab(text: "🎮"),
+                                    Tab(text: "⚽️"),
+                                    Tab(text: "🌍"),
+                                    Tab(text: "💯"),
+                                    Tab(text: "🏴"),
+                                  ],
+                                ),
+                                body: TabBarView(
+                                  children: <Widget>[
+                                    emox.emoGro1(),
+                                    emox.emoGro2(),
+                                    emox.emoGro3(),
+                                    emox.emoGro4(),
+                                    emox.emoGro5(),
+                                    emox.emoGro6(),
+                                    emox.emoGro7(),
+                                    emox.emoGro8(),
+                                  ],
+                                ),
+                              ),
+                            ),
                           )
-                        )
                       ],
                     ),
                   ),

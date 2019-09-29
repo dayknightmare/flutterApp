@@ -43,11 +43,11 @@ class PrivateChatVupy extends StatefulWidget {
   State createState() => _PrivateChatVupy();
 }
 
-class Emojis extends EmojisData{
+class Emojis extends EmojisData {
   Emojis(double media, List emojis) : super(media, emojis);
 
   @override
-  void addEmoji(emo){
+  void addEmoji(emo) {
     publ.text += emo;
   }
 }
@@ -59,7 +59,6 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
 
   String name, myname, image, api, url = URL().getUrl(), filter;
   String style = "https://vupytcc.pythonanywhere.com/static/img/user.png";
-
 
   File filec;
 
@@ -74,6 +73,8 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
   Color differNav;
 
   bool _visible = false;
+
+  FocusNode focusPubl = new FocusNode();
 
   void ftCamera() async {
     filec = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -196,6 +197,15 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
     super.dispose();
   }
 
+  void changeFocusPubl() {
+    if (focusPubl.hasFocus.toString() == "true") {
+      _visible = false;
+      if (this.mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   void initState() {
     id = widget.id;
@@ -205,6 +215,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
     differBtn = widget.differBtn;
     differNav = widget.differNav;
     nav = widget.nav;
+    focusPubl.addListener(changeFocusPubl);
     getP();
     gnpTime = new Timer(const Duration(seconds: 2), gnc);
     super.initState();
@@ -268,6 +279,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                 children: <Widget>[
                   Container(
                     width: MediaQuery.of(context).size.width,
+                    // padding: EdgeInsets.symmetric(horizontal: 6),
                     // height: MediaQuery.of(context).size.height * 0.7829,
                     height: imageF.length > 0
                         ? _visible == true
@@ -353,12 +365,13 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                                           context)
                                                                       .size
                                                                       .width *
-                                                                  0.6),
+                                                                  0.59),
                                                           child: Text(
                                                             talks[index][4],
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              fontFamily: "emoji",
+                                                              fontFamily:
+                                                                  "emoji",
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w400,
@@ -372,7 +385,6 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                             ),
                                                           ),
                                                         )
-
                                                       : Container(),
                                                   Container(
                                                     margin: EdgeInsets.only(
@@ -515,7 +527,10 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                         icon: Icon(IconData(0xe9dc, fontFamily: "icomoon"),
                             size: 16.0, color: differBtn),
                         onPressed: () {
-                          _visible = true;
+                          _visible = !_visible;
+                          if (_visible) {
+                            focusPubl.unfocus();
+                          }
                           if (this.mounted) {
                             setState(() {});
                           }
@@ -526,16 +541,25 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                       margin: EdgeInsets.symmetric(horizontal: 5),
                       width: MediaQuery.of(context).size.width - 165,
                       height: 50,
-                      child: TextFormField(
+                      child: TextField(
                         controller: publ,
+                        focusNode: focusPubl,
                         keyboardType: TextInputType.multiline,
+                        minLines: 1,
                         maxLines: 20,
-                        style: TextStyle(fontSize: 15.0),
+                        // keyboardType: TextInputType.multiline,
+                        // maxLines: 20,
+                        style: TextStyle(fontSize: 13.0),
                         decoration: new InputDecoration(
-                          hintText: 'Digite aqui...',
-                          enabledBorder: OutlineInputBorder(
+                          hintText: 'Faça uma publicação :)',
+                          contentPadding: const EdgeInsets.all(15.0),
+                          focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.grey, width: 1.0),
+                                BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color(0xffe6ecf0), width: 2.0),
                           ),
                         ),
                       ),
@@ -641,20 +665,40 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                         child: Column(
                           children: <Widget>[
                             Container(
-                              height: 200,
-                              child: PageView(
-                                children: <Widget>[
-                                  emox.emoGro1(),
-                                  emox.emoGro2(),
-                                  emox.emoGro3(),
-                                  emox.emoGro4(),
-                                  emox.emoGro5(),
-                                  emox.emoGro6(),
-                                  emox.emoGro7(),
-                                  emox.emoGro8(),
-                                ],
+                              height: 250,
+                              child: DefaultTabController(
+                                length: 8,
+                                child: Scaffold(
+                                  appBar: TabBar(
+                                    labelColor: Colors.black,
+                                    indicatorColor: vupycolor,
+                                    unselectedLabelColor: Colors.grey,
+                                    tabs: <Widget>[
+                                      Tab(text: "😀"),
+                                      Tab(text: "🐶"),
+                                      Tab(text: "🥯"),
+                                      Tab(text: "🎮"),
+                                      Tab(text: "⚽️"),
+                                      Tab(text: "🌍"),
+                                      Tab(text: "💯"),
+                                      Tab(text: "🏴"),
+                                    ],
+                                  ),
+                                  body: TabBarView(
+                                    children: <Widget>[
+                                      emox.emoGro1(),
+                                      emox.emoGro2(),
+                                      emox.emoGro3(),
+                                      emox.emoGro4(),
+                                      emox.emoGro5(),
+                                      emox.emoGro6(),
+                                      emox.emoGro7(),
+                                      emox.emoGro8(),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             )
-                          )
                           ],
                         ),
                       ),
@@ -667,4 +711,3 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
     );
   }
 }
-

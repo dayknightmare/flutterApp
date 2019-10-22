@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vupy/bottomAll.dart';
+import 'package:vupy/main.dart';
 import 'package:vupy/widgets/url.dart';
 
 const vupycolor = const Color(0xFFE7002B);
@@ -275,7 +276,9 @@ class _Settings extends State<Settings> {
                           onPressed: () async {
                             var prefs = await SharedPreferences.getInstance();
                             prefs.clear();
-                            Navigator.pushReplacementNamed(context, "/log");
+                            navigatorKey.currentState.pushNamedAndRemoveUntil("/log", (Route r) => false);
+                            // print("object");
+                            // Navigator.pushReplacementNamed(context, "/log");
                           },
                           color: btncp,
                         ),

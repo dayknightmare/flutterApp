@@ -177,7 +177,7 @@ class _OtherPerfil extends State<OtherPerfil> {
                           child: Text(
                             name,
                             style: new TextStyle(
-                              fontSize: 25.0,
+                              fontSize: 19.0,
                             ),
                             textAlign: TextAlign.center,
                           ),

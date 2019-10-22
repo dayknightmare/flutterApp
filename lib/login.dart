@@ -39,7 +39,9 @@ class _Loginpage extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      padding: new EdgeInsets.all(32.0),
+      padding: new EdgeInsets.symmetric(horizontal: 32),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       child: SingleChildScrollView(
         child: Center(
           child: Column(

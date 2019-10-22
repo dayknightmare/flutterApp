@@ -61,8 +61,11 @@ class _Createpage extends State<Createpage> {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      padding: new EdgeInsets.all(32.0),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      padding: new EdgeInsets.symmetric(horizontal: 32),
       child: SingleChildScrollView(
+        
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

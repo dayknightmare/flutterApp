@@ -17,7 +17,7 @@ class Perfil extends StatefulWidget {
 }
 
 class _Perfil extends State<Perfil> {
-  int myId;
+  int myId, show = 0;
 
   String url = URL().getUrl(),
       api,
@@ -33,13 +33,7 @@ class _Perfil extends State<Perfil> {
   Color trueColorBtn;
   Color differBtn = Color(0xffffffff);
 
-
-  void getP() async {
-    var jsona = {};
-    var prefs = await SharedPreferences.getInstance();
-    myId = prefs.getInt('userid') ?? 0;
-    api = prefs.getString("api") ?? '';
-
+  Future colorama(var prefs) async {
     if (this.mounted) {
       setState(() {
         var color = (prefs.getStringList("color") ?? ["255","255","255","1"]).toList().toString();
@@ -51,7 +45,14 @@ class _Perfil extends State<Perfil> {
         trueColorBtn = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
       });
     }
-    
+  }
+
+  Future getP() async {
+    var prefs = await SharedPreferences.getInstance();
+    colorama(prefs);
+    var jsona = {};
+    myId = prefs.getInt('userid') ?? 0;
+    api = prefs.getString("api") ?? '';
     jsona["user"] = myId;
     jsona["api"] = api;
     
@@ -70,8 +71,12 @@ class _Perfil extends State<Perfil> {
       capeuser = url + "/media" + resposta['style'][0];
     }
 
-    talks = resposta['talks'];
-    name = resposta['name'];
+    if (this.mounted) {
+      setState(() {
+        talks = resposta['talks'];
+        name = resposta['name'];
+      });
+    }
 
     Future colorsnavs = ColorsGetCustom().getColorNavAndBtn(
       resposta['navcolor'],
@@ -80,15 +85,18 @@ class _Perfil extends State<Perfil> {
       trueColorBtn
     );
 
-    colorsnavs.then((response){
-      trueColor = response[0];
-      differ = response[1];
-      trueColorBtn = response[2];
-      differBtn = response[3];
-    });
+    
 
     if (this.mounted) {
-      setState(() {});
+      setState(() {
+        colorsnavs.then((response){
+          trueColor = response[0];
+          differ = response[1];
+          trueColorBtn = response[2];
+          differBtn = response[3];
+          show = 1;
+        });
+      });
     }
   }
 
@@ -108,6 +116,16 @@ class _Perfil extends State<Perfil> {
 
   @override
   Widget build(BuildContext context) {
+    // if (show == 0) {
+    //   return Center(
+    //     child: Container(
+    //       color: Colors.white,
+    //       width: MediaQuery.of(context).size.width,
+    //       height: MediaQuery.of(context).size.height,
+    //       child: Image.asset("assets/load.gif")
+    //     )
+    //   );
+    // }
     return Stack(
       children: <Widget>[
         CustomScrollView(
@@ -195,7 +213,7 @@ class _Perfil extends State<Perfil> {
                         child: Text(
                           name,
                           style: new TextStyle(
-                            fontSize: 25.0,
+                            fontSize: 19.0,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -207,6 +225,31 @@ class _Perfil extends State<Perfil> {
                   ),
                 ),
               ]),
+            ),
+
+            /* ------------- LOAD  ------------- */
+            show == 0 ?
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      color: Colors.white,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height - 300,
+                      child: Image.asset("assets/load.gif")
+                    );
+                  },
+                  childCount: 1,
+                ),
+              )
+            :
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return Container();
+                },
+                childCount: 1,
+              ),
             ),
 
             /* ------ POSTS ------ */

@@ -283,11 +283,11 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                     // height: MediaQuery.of(context).size.height * 0.7829,
                     height: imageF.length > 0
                         ? _visible == true
-                            ? MediaQuery.of(context).size.height * 0.61 - 250
-                            : MediaQuery.of(context).size.height * 0.61
+                            ? MediaQuery.of(context).size.height - 500
+                            : MediaQuery.of(context).size.height - 250
                         : _visible == true
-                            ? MediaQuery.of(context).size.height * 0.7829 - 250
-                            : MediaQuery.of(context).size.height * 0.7829,
+                            ? MediaQuery.of(context).size.height - 400
+                            : MediaQuery.of(context).size.height - 150,
                     child: CustomScrollView(
                       reverse: true,
                       semanticChildCount: talks.length,
@@ -542,24 +542,25 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                       width: MediaQuery.of(context).size.width - 165,
                       height: 50,
                       child: TextField(
+                        
                         controller: publ,
                         focusNode: focusPubl,
                         keyboardType: TextInputType.multiline,
-                        minLines: 1,
+                        minLines: 5,
                         maxLines: 20,
-                        // keyboardType: TextInputType.multiline,
-                        // maxLines: 20,
+
                         style: TextStyle(fontSize: 13.0),
                         decoration: new InputDecoration(
                           hintText: 'Faça uma publicação :)',
-                          contentPadding: const EdgeInsets.all(15.0),
+                          contentPadding: const EdgeInsets.all(5.0),
                           focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 1.5),
+                            borderSide: BorderSide(color: Colors.black, width: 1.5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color(0xffe6ecf0), width: 2.0),
+                              color: Color(0xffe6ecf0),
+                              width: 2.0
+                            ),
                           ),
                         ),
                       ),

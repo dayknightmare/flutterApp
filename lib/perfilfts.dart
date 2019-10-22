@@ -31,7 +31,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
   File ftFileCrop, cpFileCrop;
   String cpImage = "", ftImage = "";
 
-  int myId;
+  int myId, show = 0;
   bool changed = false;
   String url = URL().getUrl(),
       api,
@@ -102,6 +102,7 @@ class _PerfilFtPage extends State<PerfilFtPage> {
     if (this.mounted) {
       setState(() {});
     }
+    show = 1;
   }
 
   @override
@@ -152,6 +153,16 @@ class _PerfilFtPage extends State<PerfilFtPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (show == 0) {
+      return Center(
+        child: Container(
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Image.asset("assets/load.gif")
+        )
+      );
+    }
     void ftCamera() async {
       ftFile = await ImagePicker.pickImage(source: ImageSource.camera);
       ftImage = ftFile.path;

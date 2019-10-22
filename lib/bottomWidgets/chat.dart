@@ -16,7 +16,7 @@ class ChatVupy extends StatefulWidget {
 }
 
 class _ChatVupy extends State<ChatVupy> {
-  int myId, ids;
+  int myId, ids, show = 0;
   String api, url = URL().getUrl();
   List friends = [];
   Color trueColor;
@@ -24,11 +24,7 @@ class _ChatVupy extends State<ChatVupy> {
   Color differBtn = Color(0xffffffff);
   Color vupycolor = Color(0xffe7002a);
 
-  void getP() async {
-    var prefs = await SharedPreferences.getInstance();
-    myId = prefs.getInt('userid') ?? 0;
-    api = prefs.getString("api") ?? '';
-
+  Future colorama(var prefs) async {
     if (this.mounted) {
       setState(() {
         var color = (prefs.getStringList("color") ?? ["255", "255", "255", "1"])
@@ -45,28 +41,44 @@ class _ChatVupy extends State<ChatVupy> {
         vupycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
       });
     }
+  }
+
+  void getP() async {
+    var prefs = await SharedPreferences.getInstance();
+    colorama(prefs);
+    myId = prefs.getInt('userid') ?? 0;
+    api = prefs.getString("api") ?? '';
 
     var jsona = {};
+
     jsona["user"] = myId;
     jsona["api"] = api;
+
     var r = await http.post(Uri.encodeFull(url + "/workserver/gmf/"),
         body: json.encode(jsona));
+
     var resposta = json.decode(r.body);
-    friends.addAll(resposta['resposta']);
+
+    if (this.mounted) {
+      setState(() {
+        friends.addAll(resposta['resposta']);
+      });
+    }
 
     Future colorsnav = ColorsGetCustom().getColorNavAndBtn(
         resposta['navcolor'], trueColor, resposta['themecolor'], vupycolor);
 
-    colorsnav.then((response) {
-      trueColor = response[0];
-      differ = response[1];
-      vupycolor = response[2];
-      differBtn = response[3];
-    });
-
     if (this.mounted) {
-      setState(() {});
+      setState(() {
+        colorsnav.then((response) {
+          trueColor = response[0];
+          differ = response[1];
+          vupycolor = response[2];
+          differBtn = response[3];
+        });
+      });
     }
+    show = 1;
   }
 
   @override
@@ -82,6 +94,16 @@ class _ChatVupy extends State<ChatVupy> {
 
   @override
   Widget build(BuildContext context) {
+    // if (show == 0) {
+    //   return Center(
+    //     child: Container(
+    //       color: Colors.white,
+    //       width: MediaQuery.of(context).size.width,
+    //       height: MediaQuery.of(context).size.height,
+    //       child: Image.asset("assets/load.gif")
+    //     )
+    //   );
+    // }
     return Stack(
       children: <Widget>[
         CustomScrollView(
@@ -104,19 +126,42 @@ class _ChatVupy extends State<ChatVupy> {
                   ),
                   onPressed: () async {
                     Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Settings(
-                          navcolor: trueColor, 
-                          btn: vupycolor,
-                          returnPage: 1
-                        )
-                      )
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Settings(
+                                navcolor: trueColor,
+                                btn: vupycolor,
+                                returnPage: 1)));
                   },
                 ),
               ],
             ),
+
+            /* ------------- LOAD  ------------- */
+            show == 0 ?
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      color: Colors.white,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Image.asset("assets/load.gif")
+                    );
+                  },
+                  childCount: 1,
+                ),
+              )
+            :
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return Container();
+                },
+                childCount: 1,
+              ),
+            ),
+
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
@@ -129,15 +174,15 @@ class _ChatVupy extends State<ChatVupy> {
                       ),
                       trailing: Container(
                         decoration: BoxDecoration(
-                          // color: vupycolor,
-                          border: Border.all(
-                            color: Color(0x01000001)
-                          ),
-                          borderRadius: BorderRadius.circular(200)
-                        ),
+                            // color: vupycolor,
+                            border: Border.all(color: Color(0x01000001)),
+                            borderRadius: BorderRadius.circular(200)),
                         child: IconButton(
                           color: Colors.blueGrey,
-                          icon: Icon(IconData(0xea00, fontFamily: 'icomoon'),size: 26,),
+                          icon: Icon(
+                            IconData(0xea00, fontFamily: 'icomoon'),
+                            size: 26,
+                          ),
                           onPressed: () {
                             Navigator.push(
                                 context,
@@ -151,7 +196,7 @@ class _ChatVupy extends State<ChatVupy> {
                       ),
                       title: Text(friends[index][1]),
                       onTap: () {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PrivateChatVupy(

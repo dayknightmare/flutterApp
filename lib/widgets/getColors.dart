@@ -47,9 +47,6 @@ class ColorsGetCustom{
     }
     colors.add(trueColorNav);
     colors.add(differNav);
-
-
-    print(btn);
     if (btn != "white" && btn != null) {
       color = btn.replaceAll("rbg(","").replaceAll(")", "").replaceAll("rgba(","");
       color = "[" + color +  "]";

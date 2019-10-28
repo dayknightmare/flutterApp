@@ -11,10 +11,13 @@ class ColorsGetCustom{
     Color trueColorNav,
     String btn,
     Color trueColorBtn,
+    int dark,
+    String bodycolor,
+    Color trueBodyColor,
     {int you=0}
   ) async {
 
-    List<Color> colors = [];
+    List colors = [];
     var prefs = await SharedPreferences.getInstance();
     Color differNav;
     Color trueColorNav;
@@ -34,7 +37,6 @@ class ColorsGetCustom{
           cca[0].toString(), cca[1].toString(), cca[2].toString(),
         ]);
       }
-
     }
     else{
       trueColorNav = Color(0xffffffff);
@@ -70,9 +72,29 @@ class ColorsGetCustom{
       differBtn = Colors.white;
     }
 
+    if (you == 0) {
+      prefs.setInt("dark", dark);
+    }
+
     colors.add(trueColorBtn);
     colors.add(differBtn);
+    colors.add(dark);
 
+    if (bodycolor != "white" && !bodycolor.contains("/BTU/")) {
+      color = bodycolor.replaceAll("rbg(","").replaceAll(")", "").replaceAll("rgba(","");
+      color = "[" + color +  "]";
+      cca = jsonDecode(color);
+      antColor = trueBodyColor;
+      trueBodyColor = Color.fromRGBO(cca[0], cca[1], cca[2], 1);
+
+      if (trueBodyColor != antColor && you == 0) {
+        prefs.setStringList("body", [
+          cca[0].toString(), cca[1].toString(), cca[2].toString(),
+        ]);
+      }
+    }
+
+    colors.add(trueBodyColor);
     return colors;
   }
 }

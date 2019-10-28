@@ -118,21 +118,27 @@ class _PerfilFtPage extends State<PerfilFtPage> {
 
   Future<String> sendFTs() async {
     var prefs = await SharedPreferences.getInstance();
+
     myId = prefs.getInt('userid') ?? 0;
     api = prefs.getString("api") ?? '';
+
     if (ftImage != "") {
       var uri = Uri.parse(url + "/workserver/postftU/");
       var request = new http.MultipartRequest("POST", uri);
+
       request.fields['user'] = myId.toString();
+
       var stream =
           new http.ByteStream(DelegatingStream.typed(ftFile.openRead()));
+
       var length = await ftFile.length();
-      print(ftFile.path.split("/").last);
+    
       var multipartFile = new http.MultipartFile('ftuser', stream, length,
           filename: basename(ftFile.path));
+
       request.files.add(multipartFile);
-      var response = await request.send();
-      print(response.statusCode);
+      await request.send();
+
     }
     if (cpImage != "") {
       var uri = Uri.parse(url + "/workserver/postCtU/");
@@ -141,12 +147,10 @@ class _PerfilFtPage extends State<PerfilFtPage> {
       var stream =
           new http.ByteStream(DelegatingStream.typed(cpFile.openRead()));
       var length = await cpFile.length();
-      print(cpFile.path.split("/").last);
       var multipartFile = new http.MultipartFile('capeuser', stream, length,
           filename: basename(cpFile.path));
       request.files.add(multipartFile);
-      var response = await request.send();
-      print(response.statusCode);
+      await request.send();
     }
     return "ok";
   }

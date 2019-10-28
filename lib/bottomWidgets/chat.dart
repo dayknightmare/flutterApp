@@ -11,18 +11,90 @@ import '../privateChat.dart';
 import '../settings.dart';
 
 class ChatVupy extends StatefulWidget {
+  final _ChatVupy chat = new _ChatVupy();
+
+  void styles(dark, nav, colorB) {
+    chat.styles(dark, nav, colorB);
+  }
+
   @override
-  State createState() => _ChatVupy();
+  State createState() => chat;
+
 }
 
-class _ChatVupy extends State<ChatVupy> {
-  int myId, ids, show = 0;
+class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
+  int myId, ids, show = 0, experince = 0;
   String api, url = URL().getUrl();
   List friends = [];
-  Color trueColor;
+  Color trueColor, bodycolor;
   Color differ = Color(0xffffffff);
   Color differBtn = Color(0xffffffff);
   Color vupycolor = Color(0xffe7002a);
+  Color syntax = Color(0xffffffff);
+  Color syntaxdiffer = Color(0xff000000);
+  bool dark;
+
+  Future styles(darkx, nav, btn) async {
+    
+    if (experince == 0) {
+      experince = 1;
+      return;
+    }
+    dark = darkx;
+    trueColor = nav;
+    vupycolor = btn;
+    show = 1;
+
+    if (trueColor.computeLuminance() > 0.673) {
+      differ = Colors.black;
+    }
+    if (vupycolor.computeLuminance() > 0.673) {
+      differBtn = Colors.black;
+    }
+
+    if (dark == true) {
+      syntax = Color(0xff282828);
+      syntaxdiffer = Color(0xffffffff);
+    } else {
+      syntax = Colors.white;
+      syntaxdiffer = Colors.black;
+    }
+
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  void onlinecolors(resposta) {
+    Future colorsnav = ColorsGetCustom().getColorNavAndBtn(
+        resposta['navcolor'],
+        trueColor,
+        resposta['themecolor'],
+        vupycolor,
+        resposta['dark'],
+        resposta['bodycolor'],
+        bodycolor);
+    if (this.mounted) {
+      setState(() {
+        colorsnav.then((response) {
+          trueColor = response[0];
+          differ = response[1];
+          vupycolor = response[2];
+          differBtn = response[3];
+          show = 1;
+          if (response[4] == 1) {
+            syntax = Color(0xff282828);
+            syntaxdiffer = Color(0xffffffff);
+            dark = true;
+          } else {
+            syntax = Colors.white;
+            syntaxdiffer = Colors.black;
+            dark = false;
+          }
+        });
+      });
+    }
+  }
 
   Future colorama(var prefs) async {
     if (this.mounted) {
@@ -39,6 +111,12 @@ class _ChatVupy extends State<ChatVupy> {
             .toString();
         cc = jsonDecode(color);
         vupycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+
+        color = (prefs.getStringList("body") ?? ["255", "255", "255", "1"])
+            .toList()
+            .toString();
+        cc = jsonDecode(color);
+        bodycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
       });
     }
   }
@@ -65,19 +143,7 @@ class _ChatVupy extends State<ChatVupy> {
       });
     }
 
-    Future colorsnav = ColorsGetCustom().getColorNavAndBtn(
-        resposta['navcolor'], trueColor, resposta['themecolor'], vupycolor);
-
-    if (this.mounted) {
-      setState(() {
-        colorsnav.then((response) {
-          trueColor = response[0];
-          differ = response[1];
-          vupycolor = response[2];
-          differBtn = response[3];
-        });
-      });
-    }
+    onlinecolors(resposta);
     show = 1;
   }
 
@@ -94,16 +160,9 @@ class _ChatVupy extends State<ChatVupy> {
 
   @override
   Widget build(BuildContext context) {
-    // if (show == 0) {
-    //   return Center(
-    //     child: Container(
-    //       color: Colors.white,
-    //       width: MediaQuery.of(context).size.width,
-    //       height: MediaQuery.of(context).size.height,
-    //       child: Image.asset("assets/load.gif")
-    //     )
-    //   );
-    // }
+
+    super.build(context);
+
     return Stack(
       children: <Widget>[
         CustomScrollView(
@@ -131,6 +190,7 @@ class _ChatVupy extends State<ChatVupy> {
                             builder: (context) => Settings(
                                 navcolor: trueColor,
                                 btn: vupycolor,
+                                dark: dark,
                                 returnPage: 1)));
                   },
                 ),
@@ -138,39 +198,36 @@ class _ChatVupy extends State<ChatVupy> {
             ),
 
             /* ------------- LOAD  ------------- */
-            show == 0 ?
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Container(
-                      color: Colors.white,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: Image.asset("assets/load.gif")
-                    );
-                  },
-                  childCount: 1,
-                ),
-              )
-            :
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return Container();
-                },
-                childCount: 1,
-              ),
-            ),
-
+            show == 0
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Container(
+                            color: syntax,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                            child: Image.asset("assets/load.gif"));
+                      },
+                      childCount: 1,
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Container();
+                      },
+                      childCount: 1,
+                    ),
+                  ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   return Container(
-                    color: Colors.white,
+                    color: syntax,
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(url + friends[index][2]),
-                        backgroundColor: Colors.white,
+                        backgroundColor: syntax,
                       ),
                       trailing: Container(
                         decoration: BoxDecoration(
@@ -178,7 +235,9 @@ class _ChatVupy extends State<ChatVupy> {
                             border: Border.all(color: Color(0x01000001)),
                             borderRadius: BorderRadius.circular(200)),
                         child: IconButton(
-                          color: Colors.blueGrey,
+                          color: syntax == Color(0xff282828)
+                              ? syntaxdiffer
+                              : Colors.blueGrey,
                           icon: Icon(
                             IconData(0xea00, fontFamily: 'icomoon'),
                             size: 26,
@@ -194,7 +253,10 @@ class _ChatVupy extends State<ChatVupy> {
                           },
                         ),
                       ),
-                      title: Text(friends[index][1]),
+                      title: Text(
+                        friends[index][1],
+                        style: TextStyle(color: syntaxdiffer),
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -207,6 +269,8 @@ class _ChatVupy extends State<ChatVupy> {
                               differNav: differ,
                               differBtn: differBtn,
                               btn: vupycolor,
+                              syntax: syntax,
+                              syntaxdiffer: syntaxdiffer,
                             ),
                           ),
                         );

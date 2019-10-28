@@ -27,11 +27,16 @@ class _Perfil extends State<Perfil> {
 
   List talks = [];
 
-  Color trueColor;
+  Color trueColor, trueColorBtn, bodycolor;
   Color differ = Color(0xffffffff);
 
-  Color trueColorBtn;
   Color differBtn = Color(0xffffffff);
+
+  Color syntax = Color(0xffffffff);
+  Color syntaxdiffer = Color(0xff000000);
+
+  bool dark = false;
+
 
   Future colorama(var prefs) async {
     if (this.mounted) {
@@ -43,6 +48,10 @@ class _Perfil extends State<Perfil> {
         color = (prefs.getStringList("colorbtn") ?? ["231","0","42","1"]).toList().toString();
         cc = jsonDecode(color);
         trueColorBtn = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+
+        color = (prefs.getStringList("body") ?? ["255","255","255","1"]).toList().toString();
+        cc = jsonDecode(color);
+        bodycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
       });
     }
   }
@@ -82,10 +91,11 @@ class _Perfil extends State<Perfil> {
       resposta['navcolor'],
       trueColor,
       resposta['themecolor'],
-      trueColorBtn
+      trueColorBtn,
+      resposta['style'][5],
+      resposta['style'][6],
+      bodycolor
     );
-
-    
 
     if (this.mounted) {
       setState(() {
@@ -95,6 +105,16 @@ class _Perfil extends State<Perfil> {
           trueColorBtn = response[2];
           differBtn = response[3];
           show = 1;
+          if (response[4] == 1) {
+            dark = true;
+            syntax = Color(0xff282828);
+            syntaxdiffer = Color(0xffffffff);
+          }
+          else{
+            dark = false;
+            syntax = Colors.white;
+            syntaxdiffer = Colors.black;
+          }
         });
       });
     }
@@ -116,16 +136,6 @@ class _Perfil extends State<Perfil> {
 
   @override
   Widget build(BuildContext context) {
-    // if (show == 0) {
-    //   return Center(
-    //     child: Container(
-    //       color: Colors.white,
-    //       width: MediaQuery.of(context).size.width,
-    //       height: MediaQuery.of(context).size.height,
-    //       child: Image.asset("assets/load.gif")
-    //     )
-    //   );
-    // }
     return Stack(
       children: <Widget>[
         CustomScrollView(
@@ -145,6 +155,7 @@ class _Perfil extends State<Perfil> {
                       builder: (context) => Settings(
                         navcolor: trueColor,
                         btn: trueColorBtn,
+                        dark: dark,
                         returnPage: 2,
                       )
                     ));
@@ -209,11 +220,12 @@ class _Perfil extends State<Perfil> {
                         height: 50,
                         padding: EdgeInsets.only(top: 10),
                         width: MediaQuery.of(context).size.width,
-                        color: Colors.white,
+                        color: syntax,
                         child: Text(
                           name,
                           style: new TextStyle(
                             fontSize: 19.0,
+                            color: syntaxdiffer
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -233,7 +245,7 @@ class _Perfil extends State<Perfil> {
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return Container(
-                      color: Colors.white,
+                      color: syntax,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height - 300,
                       child: Image.asset("assets/load.gif")
@@ -268,6 +280,8 @@ class _Perfil extends State<Perfil> {
                     differBtn: differBtn,
                     differNav: differ,
                     nav: trueColor,
+                    syntax: syntax,
+                    body: bodycolor,
                   );
                 },
                 childCount: talks.length,

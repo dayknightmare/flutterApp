@@ -17,23 +17,26 @@ import 'widgets/url.dart';
 final TextEditingController commCon = TextEditingController();
 
 class Comments extends StatefulWidget {
-  Comments(
-      {Key key,
-      this.id,
-      this.name,
-      this.image,
-      this.myname,
-      this.text,
-      this.returnPage,
-      this.btn,
-      this.nav,
-      this.differNav,
-      this.differBtn})
+  Comments({
+    Key key,
+    this.id,
+    this.name,
+    this.image,
+    this.myname,
+    this.text,
+    this.returnPage,
+    this.btn,
+    this.nav,
+    this.differNav,
+    this.differBtn,
+    this.syntax,
+    this.body
+  })
       : super(key: key);
 
   final String name, image, myname, text, returnPage;
   final int id;
-  final Color btn, nav, differNav, differBtn;
+  final Color syntax, btn, nav, differNav, differBtn, body;
 
   @override
   State createState() => _Comments();
@@ -211,6 +214,7 @@ class _Comments extends State<Comments> {
     Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
 
     return Scaffold(
+      backgroundColor: widget.body,
       body: Stack(
         children: <Widget>[
           CustomScrollView(
@@ -281,7 +285,7 @@ class _Comments extends State<Comments> {
                                       ),
                                 Text(
                                   name,
-                                  style: TextStyle(fontSize: 20),
+                                  style: TextStyle(fontSize: 20, color: widget.syntax == Color(0xff282828)? Colors.white : Colors.black),
                                 ),
                               ],
                             ),
@@ -293,7 +297,7 @@ class _Comments extends State<Comments> {
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Align(
                               alignment: Alignment.topLeft,
-                              child: Text(text),
+                              child: Text(text, style: TextStyle(color: widget.syntax == Color(0xff282828)? Colors.white : Colors.black),),
                             ),
                           ),
                           Divider(
@@ -310,6 +314,7 @@ class _Comments extends State<Comments> {
                                     keyboardType: TextInputType.multiline,
                                     decoration: new InputDecoration(
                                       hintText: 'Faça uma publicação :)',
+                                      hintStyle: TextStyle(color: widget.syntax == Color(0xff282828) ? Colors.white : Colors.black),
                                       contentPadding:
                                           const EdgeInsets.all(15.0),
                                       focusedBorder: OutlineInputBorder(
@@ -318,12 +323,13 @@ class _Comments extends State<Comments> {
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: Color(0xffe6ecf0),
+                                            color: widget.syntax == Color(0xff282828) ? widget.syntax : Color(0xffe6ecf0),
                                             width: 2.0),
                                       ),
                                     ),
                                     style: new TextStyle(
                                       height: 1.0,
+                                      color: widget.syntax == Color(0xff282828) ? Colors.white : Colors.black
                                     )),
                                 Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
@@ -520,6 +526,7 @@ class _Comments extends State<Comments> {
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return Container(
+                      // color: widget.syntax,
                       margin: EdgeInsets.symmetric(vertical: 5),
                       padding: EdgeInsets.all(5),
                       child: Row(
@@ -579,9 +586,9 @@ class _Comments extends State<Comments> {
                             width: MediaQuery.of(context).size.width - 67,
                             margin: EdgeInsets.only(left: 7),
                             decoration: BoxDecoration(
-                                color: Color(0xfff0f0f6),
+                                color: widget.syntax == Color(0xff282828) ? widget.syntax : Color(0xfff0f0f6),
                                 border:
-                                    Border.all(width: 0, color: Colors.white),
+                                    Border.all(width: 0, color: widget.syntax == Color(0xff282828) ? widget.syntax : Colors.white),
                                 borderRadius: BorderRadius.circular(5)),
                             child: Column(
                               children: <Widget>[
@@ -590,7 +597,7 @@ class _Comments extends State<Comments> {
                                   child: Text(talks[index][0] +
                                       " " +
                                       talks[index][4] +
-                                      " comentou:"),
+                                      " comentou:", style: TextStyle(color: widget.syntax == Color(0xff282828) ? Colors.white : Colors.black),),
                                 ),
                                 Divider(
                                   color: Color(0x00000000),
@@ -605,7 +612,7 @@ class _Comments extends State<Comments> {
                                     : Container(),
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Text(talks[index][1]),
+                                  child: Text(talks[index][1], style: TextStyle(color: widget.syntax == Color(0xff282828) ? Colors.white : Colors.black),),
                                 ),
                               ],
                             ),
@@ -648,6 +655,7 @@ class _Comments extends State<Comments> {
                             child: DefaultTabController(
                               length: 8,
                               child: Scaffold(
+                                backgroundColor: widget.syntax,
                                 appBar: TabBar(
                                   labelColor: Colors.black,
                                   indicatorColor: vupycolor,

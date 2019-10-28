@@ -19,30 +19,41 @@ import 'dart:io';
 import '../comments.dart';
 import '../otherperfil.dart';
 import '../settings.dart';
-
 import '../widgets/emojis.dart';
+import '../widgets/heroimg.dart';
 
 const white = const Color(0xFFFFFFFF);
 final publ = TextEditingController();
 
 class HomePageVupy extends StatefulWidget {
+  final _HomePageVupy home = new _HomePageVupy();
+
   @override
-  State createState() => _HomePageVupy();
+  State createState() => home;
+
+  void ungnp(dark, nav, btn) {
+    home.ungnp(dark, nav, btn);
+  }
+
+  void stopgnp() {
+    home.stopgnp();
+  }
 }
 
-class Emojis extends EmojisData{
+class Emojis extends EmojisData {
   Emojis(double media, List emojis) : super(media, emojis);
 
   @override
-  void addEmoji(emo){
+  void addEmoji(emo) {
     publ.text += emo;
   }
 }
 
-class _HomePageVupy extends State<HomePageVupy> {
+class _HomePageVupy extends State<HomePageVupy>
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   var _visible = false, gnpTime;
 
-  bool infor = false, fail = false;
+  bool infor = false, fail = false, dark;
 
   String image = "", name, api, url = URL().getUrl(), filter;
   String ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png";
@@ -53,21 +64,96 @@ class _HomePageVupy extends State<HomePageVupy> {
   List talks = [];
   List duoemojis = [];
 
-  Color trueColor;
+  Color trueColor, trueBodyColor;
   Color differ = Color(0xffffffff);
   Color differBtn = Color(0xffffffff);
   Color vupycolor = Color(0xFFE7002B);
+  Color syntax = Color(0xffffffff);
+  Color syntaxdark = Color(0xffffffff);
+  Color syntaxdiffer = Color(0xff000000);
 
   int show = 0;
 
   TextEditingController emojicon = new TextEditingController();
 
-
   File file;
 
   FocusNode focusPubl = new FocusNode();
 
-  void likeMe(int index, int idpub) async {
+  AnimationController animationController;
+  Animation<double> animation;
+
+  Future ungnp(darkx, nav, btn) async {
+    fail = false;
+    animationController.reset();
+
+    gnpTime = new Timer(const Duration(seconds: 2), gnp);
+    var jsona = {};
+    jsona['user'] = myId;
+    jsona['api'] = api;
+
+    dark = darkx;
+    trueColor = nav;
+    vupycolor = btn;
+    show = 1;
+
+    if (trueColor.computeLuminance() > 0.673) {
+      differ = Colors.black;
+    }
+    if (vupycolor.computeLuminance() > 0.673) {
+      differBtn = Colors.black;
+    }
+
+    if (dark == true) {
+      syntax = Color(0xff282828);
+      syntaxdiffer = Color(0xffffffff);
+      syntaxdark = Color(0xff1f1f1f);
+    } else {
+      syntax = Colors.white;
+      syntaxdark = Colors.black;
+      syntaxdiffer = Colors.black;
+    }
+  }
+
+  Future stopgnp() async {
+    fail = true;
+    animationController.stop();
+  }
+
+  Future onlinecolors(var resposta) async {
+    Future colorsnav = ColorsGetCustom().getColorNavAndBtn(
+        resposta['navcolor'],
+        trueColor,
+        resposta['themecolor'],
+        vupycolor,
+        resposta['dark'],
+        resposta['bodycolor'],
+        trueBodyColor);
+    if (this.mounted) {
+      setState(() {
+        colorsnav.then((response) {
+          trueColor = response[0];
+          differ = response[1];
+          vupycolor = response[2];
+          differBtn = response[3];
+          show = 1;
+          if (response[4] == 1) {
+            syntax = Color(0xff282828);
+            syntaxdiffer = Color(0xffffffff);
+            syntaxdark = Color(0xff1f1f1f);
+            dark = true;
+          } else {
+            syntax = Colors.white;
+            syntaxdark = Colors.black;
+            syntaxdiffer = Colors.black;
+            dark = false;
+          }
+        });
+      });
+    }
+  }
+
+  Future likeMe(int index, int idpub) async {
     var jsona = {};
     jsona["user"] = myId;
     jsona["pgc"] = idpub;
@@ -125,7 +211,6 @@ class _HomePageVupy extends State<HomePageVupy> {
         if (resposta["resposta"].length > 0) {
           for (i = 0; i < resposta["resposta"].length; i++) {
             ids = resposta["resposta"][i][0];
-            print(resposta["resposta"][i].length);
             talks.insert(0, resposta["resposta"][i]);
           }
           if (i + 1 >= resposta["resposta"].length) {
@@ -142,7 +227,6 @@ class _HomePageVupy extends State<HomePageVupy> {
           }
         }
       }
-      
     }
   }
 
@@ -211,6 +295,12 @@ class _HomePageVupy extends State<HomePageVupy> {
             .toString();
         cc = jsonDecode(color);
         vupycolor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
+
+        color = (prefs.getStringList("body") ?? ["255", "255", "255", "1"])
+            .toList()
+            .toString();
+        cc = jsonDecode(color);
+        trueBodyColor = Color.fromRGBO(cc[0], cc[1], cc[2], 1);
       });
     }
   }
@@ -227,45 +317,26 @@ class _HomePageVupy extends State<HomePageVupy> {
     jsona["api"] = api;
     var resposta;
     try {
-      var r = await http.post(
-        Uri.encodeFull(url + '/workserver/getinit/'),
-        body: json.encode(jsona)
-      );
+      var r = await http.post(Uri.encodeFull(url + '/workserver/getinit/'),
+          body: json.encode(jsona));
       resposta = json.decode(r.body);
+      onlinecolors(resposta);
     } catch (e) {
       prefs.clear();
       navigatorKey.currentState.pushReplacementNamed("/log");
     }
-    
+
     if (this.mounted) {
       setState(() {
         talks.addAll(resposta["resposta"]);
       });
     }
-    
+
     ids = resposta["lsd"];
     name = resposta['name'];
 
-    duoemojis = json.decode(await rootBundle.loadString('assets/json/finish.json'));
-
-    Future colorsnav = ColorsGetCustom()
-      .getColorNavAndBtn(
-        resposta['navcolor'], 
-        trueColor, 
-        resposta['themecolor'], 
-        vupycolor
-      );
-    if (this.mounted) {
-      setState(() {
-        colorsnav.then((response) {
-        trueColor = response[0];
-        differ = response[1];
-        vupycolor = response[2];
-        differBtn = response[3];
-        show = 1;
-    });
-      });
-    }
+    duoemojis =
+        json.decode(await rootBundle.loadString('assets/json/finish.json'));
   }
 
   @override
@@ -273,9 +344,19 @@ class _HomePageVupy extends State<HomePageVupy> {
     focusPubl.addListener(changeFocusPubl);
     startChatPub();
     print("caller end");
-
     gnpTime = new Timer(const Duration(seconds: 2), gnp);
     super.initState();
+    animationController = AnimationController(
+      // vsync: this,
+      vsync: this,
+      duration: Duration(seconds: 5),
+    )..addListener(() => setState(() {}));
+    animation = Tween<double>(
+      begin: 50.0,
+      end: 120.0,
+    ).animate(animationController);
+
+    animationController.forward();
   }
 
   Future<bool> will() async {
@@ -293,11 +374,26 @@ class _HomePageVupy extends State<HomePageVupy> {
     context,
   ) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white),
-      margin: EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(color: syntax),
+      margin: EdgeInsets.only(top: 2),
       child: Column(
         children: <Widget>[
-          talks[2] != "" ? Image.network(url + talks[2]) : Container(),
+          talks[2] != ""
+              ? GestureDetector(
+                  child: Hero(
+                      child: Image.network(url + talks[2]),
+                      tag: "Images" + talks[0].toString()),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) {
+                      return DetailScreen(
+                        imageurl: url + talks[2],
+                        hero: "Images" + talks[0].toString(),
+                        name: talks[5],
+                      );
+                    }));
+                  },
+                )
+              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -338,7 +434,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                                       image: NetworkImage(ftuser),
                                       fit: BoxFit.cover)),
                             ),
-                      Text(talks[5]),
+                      Text(
+                        talks[5],
+                        style: TextStyle(color: syntaxdiffer),
+                      ),
                     ],
                   ),
                 ),
@@ -401,33 +500,40 @@ class _HomePageVupy extends State<HomePageVupy> {
                       : Container())
             ],
           ),
-          
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
               margin: const EdgeInsets.only(left: 45.0),
-              child: Text(talks[4]),
+              child: Text(
+                talks[4],
+                style: TextStyle(color: syntaxdiffer),
+              ),
             ),
           ),
           Divider(color: Color(0x00FFFFFF)),
-          talks[9] != "None" ?
-            Container(
-              margin: EdgeInsets.only(left: 45),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(talks[9]),
-              )
-            )
-          :
-            Container(),
+          talks[9] != "None"
+              ? Container(
+                  margin: EdgeInsets.only(left: 45),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      talks[9],
+                      style: TextStyle(color: syntaxdiffer),
+                    ),
+                  ))
+              : Container(),
           Container(
             margin: const EdgeInsets.only(top: 8.0, left: 45, right: 10),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: talks[3] != "" ? Text(talks[3]) : Container(),
+              child: talks[3] != ""
+                  ? Text(
+                      talks[3],
+                      style: TextStyle(color: syntaxdiffer),
+                    )
+                  : Container(),
             ),
           ),
-          
           Divider(color: Color(0xFFd2d2d2)),
           Container(
             child: Row(
@@ -440,7 +546,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                             size: 20,
                             color: Colors.grey,
                           ),
-                          label: Text("${talks[10]}"),
+                          label: Text(
+                            "${talks[10]}",
+                            style: TextStyle(color: syntaxdiffer),
+                          ),
                           onPressed: () {
                             talks[7] = 1;
                             likeMe(index, talks[0]);
@@ -452,7 +561,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                             size: 20,
                             color: vupycolor,
                           ),
-                          label: Text("${talks[10]}"),
+                          label: Text(
+                            "${talks[10]}",
+                            style: TextStyle(color: syntaxdiffer),
+                          ),
                           onPressed: () {
                             talks[7] = 0;
                             likeMe(index, talks[0]);
@@ -464,7 +576,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                       size: 20,
                       color: Colors.grey,
                     ),
-                    label: Text("${talks[12]}"),
+                    label: Text(
+                      "${talks[12]}",
+                      style: TextStyle(color: syntaxdiffer),
+                    ),
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -480,6 +595,8 @@ class _HomePageVupy extends State<HomePageVupy> {
                               differBtn: differBtn,
                               differNav: differ,
                               nav: trueColor,
+                              syntax: syntax,
+                              body: trueBodyColor,
                             ),
                           ));
                     },
@@ -490,7 +607,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                       size: 20,
                       color: Colors.grey,
                     ),
-                    label: Text("${talks[11]}"),
+                    label: Text(
+                      "${talks[11]}",
+                      style: TextStyle(color: syntaxdiffer),
+                    ),
                     onPressed: () {},
                   )
                 ]),
@@ -502,17 +622,9 @@ class _HomePageVupy extends State<HomePageVupy> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
-    // if (show == 0) {
-    //   return Center(
-    //     child: Container(
-    //       color: Colors.white,
-    //       width: MediaQuery.of(context).size.width,
-    //       height: MediaQuery.of(context).size.height,
-    //       child: Image.asset("assets/load.gif")
-    //     )
-    //   );
-    // }
+
     return Stack(
       children: [
         CustomScrollView(
@@ -539,6 +651,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                             builder: (context) => Settings(
                                   navcolor: trueColor,
                                   btn: vupycolor,
+                                  dark: dark,
                                 )));
                   },
                 ),
@@ -551,7 +664,7 @@ class _HomePageVupy extends State<HomePageVupy> {
                   Container(
                     padding: new EdgeInsets.symmetric(
                         horizontal: 10.0, vertical: 15),
-                    color: white,
+                    color: syntax,
                     child: Column(
                       children: [
                         TextField(
@@ -561,19 +674,22 @@ class _HomePageVupy extends State<HomePageVupy> {
                             keyboardType: TextInputType.multiline,
                             decoration: new InputDecoration(
                               hintText: 'Faça uma publicação :)',
+                              hintStyle: TextStyle(color: syntaxdiffer),
                               contentPadding: const EdgeInsets.all(15.0),
                               focusedBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Colors.black, width: 1.5),
+                                    BorderSide(color: syntaxdark, width: 1.5),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Color(0xffe6ecf0), width: 2.0),
+                                    color: syntax == Color(0xff282828)
+                                        ? Color(0xff181818)
+                                        : Color(0xffe6ecf0),
+                                    width: 2.0),
                               ),
                             ),
                             style: new TextStyle(
-                              height: 1.0,
-                            )),
+                                height: 1.0, color: syntaxdiffer)),
                         Container(
                           margin: const EdgeInsets.only(top: 5.0),
                           child: Row(
@@ -586,18 +702,18 @@ class _HomePageVupy extends State<HomePageVupy> {
                                     height: 40.0,
                                     width: 40,
                                     decoration: BoxDecoration(
-                                      border:
-                                          Border.all(width: 0, color: white),
+                                      border: Border.all(
+                                          width: 0, color: Color(0x01000001)),
                                       borderRadius: BorderRadius.circular(100),
                                       color: vupycolor,
                                     ),
                                     child: IconButton(
                                       padding: new EdgeInsets.all(0.0),
                                       icon: Icon(
-                                          IconData(0xe92b,
-                                              fontFamily: "icomoon"),
-                                          size: 20.0,
-                                          color: differBtn),
+                                        IconData(0xe92b, fontFamily: "icomoon"),
+                                        size: 20.0,
+                                        color: differBtn,
+                                      ),
                                       onPressed: () {
                                         showDialog(
                                           context: context,
@@ -612,10 +728,10 @@ class _HomePageVupy extends State<HomePageVupy> {
                                                     MaterialButton(
                                                       shape:
                                                           RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8)),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
                                                       onPressed: () {
                                                         ftGaleria();
                                                         Navigator.pop(context);
@@ -652,8 +768,8 @@ class _HomePageVupy extends State<HomePageVupy> {
                                     width: 40,
                                     height: 40,
                                     decoration: BoxDecoration(
-                                      border:
-                                          Border.all(width: 0, color: white),
+                                      border: Border.all(
+                                          width: 0, color: Color(0x01000001)),
                                       borderRadius: BorderRadius.circular(100),
                                       color: vupycolor,
                                     ),
@@ -719,29 +835,27 @@ class _HomePageVupy extends State<HomePageVupy> {
             ),
 
             /* ------------- LOAD  ------------- */
-            show == 0 ?
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Container(
-                      color: Colors.white,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height - 300,
-                      child: Image.asset("assets/load.gif")
-                    );
-                  },
-                  childCount: 1,
-                ),
-              )
-            :
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return Container();
-                },
-                childCount: 1,
-              ),
-            ),
+            show == 0
+                ? SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Container(
+                            color: syntax,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height - 300,
+                            child: Image.asset("assets/load.gif"));
+                      },
+                      childCount: 1,
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Container();
+                      },
+                      childCount: 1,
+                    ),
+                  ),
 
             /* ------------- POSTS ------------- */
 
@@ -787,40 +901,41 @@ class _HomePageVupy extends State<HomePageVupy> {
                     child: Column(
                       children: <Widget>[
                         Container(
-                            height: 250,
-                            child: DefaultTabController(
-                              length: 8,
-                              child: Scaffold(
-                                appBar: TabBar(
-                                  labelColor: Colors.black,
-                                  indicatorColor: vupycolor,
-                                  unselectedLabelColor: Colors.grey,
-                                  tabs: <Widget>[
-                                    Tab(text: "😀"),
-                                    Tab(text: "🐶"),
-                                    Tab(text: "🍎"),
-                                    Tab(text: "🎮"),
-                                    Tab(text: "⚽️"),
-                                    Tab(text: "🌍"),
-                                    Tab(text: "💯"),
-                                    Tab(text: "🏴"),
-                                  ],
-                                ),
-                                body: TabBarView(
-                                  children: <Widget>[
-                                    emox.emoGro1(),
-                                    emox.emoGro2(),
-                                    emox.emoGro3(),
-                                    emox.emoGro4(),
-                                    emox.emoGro5(),
-                                    emox.emoGro6(),
-                                    emox.emoGro7(),
-                                    emox.emoGro8(),
-                                  ],
-                                ),
+                          height: 250,
+                          child: DefaultTabController(
+                            length: 8,
+                            child: Scaffold(
+                              backgroundColor: syntax,
+                              appBar: TabBar(
+                                labelColor: Colors.black,
+                                indicatorColor: vupycolor,
+                                unselectedLabelColor: Colors.grey,
+                                tabs: <Widget>[
+                                  Tab(text: "😀"),
+                                  Tab(text: "🐶"),
+                                  Tab(text: "🍎"),
+                                  Tab(text: "🎮"),
+                                  Tab(text: "⚽️"),
+                                  Tab(text: "🌍"),
+                                  Tab(text: "💯"),
+                                  Tab(text: "🏴"),
+                                ],
+                              ),
+                              body: TabBarView(
+                                children: <Widget>[
+                                  emox.emoGro1(),
+                                  emox.emoGro2(),
+                                  emox.emoGro3(),
+                                  emox.emoGro4(),
+                                  emox.emoGro5(),
+                                  emox.emoGro6(),
+                                  emox.emoGro7(),
+                                  emox.emoGro8(),
+                                ],
                               ),
                             ),
-                          )
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -830,4 +945,7 @@ class _HomePageVupy extends State<HomePageVupy> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

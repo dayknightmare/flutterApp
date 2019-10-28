@@ -28,8 +28,11 @@ class _OtherPerfil extends State<OtherPerfil> {
   Color trueColor;
   Color differ = Color(0xffffffff);
 
-  Color trueColorBtn;
+  Color trueColorBtn, bodycolor;
   Color differBtn = Color(0xffffffff);
+
+  Color syntax = Color(0xffffffff);
+  Color syntaxdiffer = Color(0xff000000);
 
   void getP() async {
     var jsona = {};
@@ -69,6 +72,9 @@ class _OtherPerfil extends State<OtherPerfil> {
       Color(0xffffffff),
       resposta['style'][3],
       Color(0xffe7002a),
+      resposta['style'][4],
+      resposta['style'][5],
+      bodycolor,
       you: 1,
     );
 
@@ -77,6 +83,11 @@ class _OtherPerfil extends State<OtherPerfil> {
       differ = response[1];
       trueColorBtn = response[2];
       differBtn = response[3];
+      bodycolor = response[5];
+      if (response[4] == 1) {
+        syntax = Color(0xff282828);
+        syntaxdiffer = Color(0xffffffff);
+      }
     });
 
     setState(() {});
@@ -100,7 +111,7 @@ class _OtherPerfil extends State<OtherPerfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0Xffe6ecf0),
+      backgroundColor: bodycolor,
       body: Stack(
         children: <Widget>[
           CustomScrollView(
@@ -173,17 +184,18 @@ class _OtherPerfil extends State<OtherPerfil> {
                           height: 50,
                           padding: EdgeInsets.only(top: 10),
                           width: MediaQuery.of(context).size.width,
-                          color: Colors.white,
+                          color: syntax,
                           child: Text(
                             name,
                             style: new TextStyle(
                               fontSize: 19.0,
+                              color: syntaxdiffer
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Divider(
-                          color: Color(0Xffe6ecf0),
+                          color: Color(0X01000001),
                         ),
                       ],
                     ),
@@ -207,6 +219,8 @@ class _OtherPerfil extends State<OtherPerfil> {
                       differBtn: differBtn,
                       differNav: differ,
                       nav: trueColor,
+                      syntax: syntax,
+                      body: bodycolor,
                     );
                   },
                   childCount: talks.length,

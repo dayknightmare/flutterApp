@@ -20,15 +20,18 @@ import 'bottomAll.dart';
 final TextEditingController publ = TextEditingController();
 
 class PrivateChatVupy extends StatefulWidget {
-  PrivateChatVupy(
-      {Key key,
-      this.id,
-      this.name,
-      this.image,
-      this.btn,
-      this.differBtn,
-      this.nav,
-      this.differNav})
+  PrivateChatVupy({
+    Key key,
+    this.id,
+    this.name,
+    this.image,
+    this.btn,
+    this.differBtn,
+    this.nav,
+    this.differNav,
+    this.syntax,
+    this.syntaxdiffer
+  })
       : super(key: key);
 
   final int id;
@@ -38,6 +41,9 @@ class PrivateChatVupy extends StatefulWidget {
   final Color differBtn;
   final Color nav;
   final Color differNav;
+  final Color syntax;
+  final Color syntaxdiffer;
+
 
   @override
   State createState() => _PrivateChatVupy();
@@ -261,16 +267,17 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
             await gnpTime.cancel();
             fail = 1;
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyHomePage(
-                    page: 1,
-                  ),
-                ));
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  page: 1,
+                ),
+              )
+            );
           },
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: widget.syntax,
       body: SingleChildScrollView(
         child: Container(
           child: Column(
@@ -320,7 +327,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                               decoration: new BoxDecoration(
                                                 color: talks[index][2] == id
                                                     ? Color(0Xff347cd5)
-                                                    : Color(0Xffe6ecf0),
+                                                    : widget.syntax == Color(0xff282828) ? Color(0x1f1f1f) : Color(0Xffe6ecf0),
                                                 border: new Border.all(
                                                   width: 0.0,
                                                   color:
@@ -380,8 +387,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                                           [2] ==
                                                                       id
                                                                   ? Colors.white
-                                                                  : Colors
-                                                                      .black,
+                                                                  : widget.syntax == Color(0xff282828) ? Colors.white : Colors.black
                                                             ),
                                                           ),
                                                         )
@@ -403,13 +409,13 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                         talks[index][5],
                                                         style: TextStyle(
                                                           fontWeight:
-                                                              FontWeight.w500,
+                                                              FontWeight.w400,
                                                           fontSize: 13,
                                                           color: talks[index]
                                                                       [2] ==
                                                                   id
                                                               ? Colors.white
-                                                              : Colors.black,
+                                                              : widget.syntax == Color(0xff282828) ? Colors.white : Colors.black,
                                                         ),
                                                       ),
                                                     ),
@@ -506,7 +512,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                     )
                   : Container(),
               Container(
-                color: Colors.white,
+                color: widget.syntax,
                 height: MediaQuery.of(context).size.height * 0.1,
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                 child: Row(
@@ -549,16 +555,18 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                         minLines: 5,
                         maxLines: 20,
 
-                        style: TextStyle(fontSize: 13.0),
+                        style: TextStyle(fontSize: 13.0, color: widget.syntaxdiffer),
                         decoration: new InputDecoration(
                           hintText: 'Faça uma publicação :)',
+                          
+                          hintStyle: TextStyle(color: widget.syntaxdiffer),
                           contentPadding: const EdgeInsets.all(5.0),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black, width: 1.5),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color(0xffe6ecf0),
+                              color: widget.syntax == Color(0xff282828) ? Color(0xff1f1f1f) : Color(0xffe6ecf0),
                               width: 2.0
                             ),
                           ),
@@ -670,7 +678,9 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                               child: DefaultTabController(
                                 length: 8,
                                 child: Scaffold(
+                                  backgroundColor: widget.syntax,
                                   appBar: TabBar(
+                                    
                                     labelColor: Colors.black,
                                     indicatorColor: vupycolor,
                                     unselectedLabelColor: Colors.grey,

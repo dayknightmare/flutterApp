@@ -19,12 +19,13 @@ final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 void main() => runApp(new MaterialApp(
       theme: ThemeData(
-        // primarySwatch: Colors.red,
-        // primaryTextTheme: TextTheme(title: TextStyle(color: Colors.black)),
-        // primaryColor: Colors.black,
-        // accentColor: Colors.black,
+        primarySwatch: Colors.red,
+        primaryTextTheme: TextTheme(title: TextStyle(color: Colors.black)),
+        primaryColor: Colors.black,
+        accentColor: Colors.black,
         fontFamily: "Poppins",
       ),
+      title: "Vupy",
       navigatorKey: navigatorKey,
       home: new MyApp(),
       debugShowCheckedModeBanner: false,

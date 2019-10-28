@@ -17,12 +17,14 @@ class Settings extends StatefulWidget {
     this.navcolor, 
     this.btn, 
     this.returnPage = 0,
+    this.dark,
 
   }) : super(key: key);
 
   final Color navcolor;
   final Color btn;
   final int returnPage;
+  final bool dark;
 
   @override
   State createState() => _Settings();
@@ -41,12 +43,15 @@ class _Settings extends State<Settings> {
   List colorsR;
 
   String url = URL().getUrl();
+  String body;
+
+  bool dark = true;
 
   void gets() async {
     if (widget.navcolor != null) {
       c = widget.navcolor;
       cp = widget.navcolor;
-      print(cp.computeLuminance());
+      dark = widget.dark;
       if (cp.computeLuminance() > 0.673) {
         differ = Colors.black;
       } else {
@@ -57,7 +62,6 @@ class _Settings extends State<Settings> {
     if (widget.btn != null) {
       btnc = widget.btn;
       btncp = widget.btn;
-      print(btncp.computeLuminance());
       if (btncp.computeLuminance() > 0.673) {
         differBtn = Colors.black;
       } else {
@@ -85,6 +89,38 @@ class _Settings extends State<Settings> {
     request.fields['api'] = prefs.getString("api") ?? '';
     request.fields['user'] = (prefs.getInt('userid') ?? 0).toString();
     request.fields['private'] = (-1).toString();
+    if (body != null) {
+      request.fields['bodycolorRGB'] = body;
+    }
+
+    if (dark == true) {
+      request.fields['dark'] = (1).toString();
+      prefs.setInt("dark", 1);
+
+      if (body != null) {
+      
+        prefs.setStringList("body", [
+          "31",
+          "31",
+          "31"
+        ]);
+      }
+
+
+    }
+
+    else{
+      request.fields['dark'] = (0).toString();
+      prefs.setInt("dark", 0);
+
+      if (body != null) {
+        prefs.setStringList("body", [
+          "230",
+          "236",
+          "240"
+        ]);
+      }
+    }
 
     var colorCodeRBGA = "rgba(" +
       cp.red.toString() +
@@ -112,6 +148,8 @@ class _Settings extends State<Settings> {
     prefs.setStringList(
         "colorbtn", [btncp.red.toString(), btncp.green.toString(), btncp.blue.toString()]);
 
+
+    print(request.fields);
     var response = await request.send();
       if (response.statusCode == 200) {
         if (this.mounted) {
@@ -259,6 +297,33 @@ class _Settings extends State<Settings> {
           ),
 
           ListTile(
+            title: Text("Modo dark"),
+            leading: Switch(
+              value: dark,
+              onChanged: (v){
+                if (this.mounted) {
+                  setState(() {
+                    dark = v;
+                    if (v == true) {
+                      body = "rgba(31,31,31,1)";
+                      cp = Color.fromRGBO(40, 40, 40, 1);
+                      differ = Colors.white;
+                    }
+                    else{
+                      body = "rgba(230, 236, 240,1)";
+                      cp = Color.fromRGBO(255, 255, 255, 1);
+                      differ = Colors.black;
+                    }
+
+                  });
+                }
+              },
+              activeColor: btncp,
+              activeTrackColor: btncp,
+            ),
+          ),
+
+          ListTile(
             onTap: (){
               showDialog(
                 context: context,
@@ -308,9 +373,6 @@ class _Settings extends State<Settings> {
                 child: Icon(IconData(0xe98f, fontFamily: "icomoon")),
               ),
             ),
-            
-            
-            
           )
         ],
       )

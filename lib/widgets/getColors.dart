@@ -47,6 +47,7 @@ class ColorsGetCustom{
     else{
       differNav = Colors.white;
     }
+
     colors.add(trueColorNav);
     colors.add(differNav);
     if (btn != "white" && btn != null) {
@@ -91,6 +92,15 @@ class ColorsGetCustom{
         prefs.setStringList("body", [
           cca[0].toString(), cca[1].toString(), cca[2].toString(),
         ]);
+      }
+    }
+    else{
+      if (dark == 1) {
+        trueBodyColor = Color(0xff1f1f1f);
+      }
+      else{
+        trueBodyColor = Color(0xffe6ecf0);
+
       }
     }
 

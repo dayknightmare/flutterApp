@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:vupy/main.dart';
+import 'package:vupy/widgets/downloadfile.dart';
 import 'package:vupy/widgets/getColors.dart';
 import 'package:vupy/widgets/url.dart';
 
@@ -50,12 +51,13 @@ class Emojis extends EmojisData {
 }
 
 class _HomePageVupy extends State<HomePageVupy>
-    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
+    with AutomaticKeepAliveClientMixin {
   var _visible = false, gnpTime;
 
   bool infor = false, fail = false, dark;
 
   String image = "", name, api, url = URL().getUrl(), filter;
+  String dirpath = "/storage/emulated/0/vupyfiles/";
   String ftuser = "https://vupytcc.pythonanywhere.com/static/img/user.png";
 
   int myId, ids;
@@ -65,8 +67,8 @@ class _HomePageVupy extends State<HomePageVupy>
   List duoemojis = [];
 
   Color trueColor, trueBodyColor;
-  Color differ = Color(0xffffffff);
-  Color differBtn = Color(0xffffffff);
+  Color differ = Color(0xff000000);
+  Color differBtn = Color(0xff000000);
   Color vupycolor = Color(0xFFE7002B);
   Color syntax = Color(0xffffffff);
   Color syntaxdark = Color(0xffffffff);
@@ -80,44 +82,50 @@ class _HomePageVupy extends State<HomePageVupy>
 
   FocusNode focusPubl = new FocusNode();
 
-  AnimationController animationController;
-  Animation<double> animation;
-
   Future ungnp(darkx, nav, btn) async {
     fail = false;
-    animationController.reset();
 
-    gnpTime = new Timer(const Duration(seconds: 2), gnp);
-    var jsona = {};
-    jsona['user'] = myId;
-    jsona['api'] = api;
+    gnpTime = new Timer(const Duration(seconds: 1), gnp);
 
-    dark = darkx;
-    trueColor = nav;
-    vupycolor = btn;
-    show = 1;
+    if (this.mounted) {
+      setState(() {
+        dark = darkx;
+        trueColor = nav;
+        vupycolor = btn;
+        show = 1;
 
-    if (trueColor.computeLuminance() > 0.673) {
-      differ = Colors.black;
-    }
-    if (vupycolor.computeLuminance() > 0.673) {
-      differBtn = Colors.black;
-    }
+        if (trueColor.computeLuminance() > 0.673) {
+          differ = Colors.black;
+        }
+        else{
+          differ = Colors.white;
+        }
+        if (vupycolor.computeLuminance() > 0.673) {
+          differBtn = Colors.black;
+        }
+        else{
+          differBtn = Colors.white;
+        }
 
-    if (dark == true) {
-      syntax = Color(0xff282828);
-      syntaxdiffer = Color(0xffffffff);
-      syntaxdark = Color(0xff1f1f1f);
-    } else {
-      syntax = Colors.white;
-      syntaxdark = Colors.black;
-      syntaxdiffer = Colors.black;
+        if (dark == true) {
+          syntax = Color(0xff282828);
+          syntaxdiffer = Color(0xffffffff);
+          syntaxdark = Color(0xff1f1f1f);
+        } else {
+          syntax = Colors.white;
+          syntaxdark = Colors.black;
+          syntaxdiffer = Colors.black;
+        }
+      });
     }
   }
 
   Future stopgnp() async {
     fail = true;
-    animationController.stop();
+  }
+
+  Future downloadfilevupy(fileurl, filename, c) async {
+    new DownFileVupy().downloadFile(fileurl, filename, c);
   }
 
   Future onlinecolors(var resposta) async {
@@ -197,7 +205,7 @@ class _HomePageVupy extends State<HomePageVupy>
     }
   }
 
-  void gnp() async {
+  Future gnp() async {
     var jsona = {};
     if (myId != null || ids != null) {
       jsona["user"] = myId;
@@ -205,7 +213,15 @@ class _HomePageVupy extends State<HomePageVupy>
       jsona["api"] = api;
       var r = await http.post(Uri.encodeFull(url + "/workserver/gnp/"),
           body: json.encode(jsona));
-      var resposta = json.decode(r.body);
+      var resposta;
+      try {
+        resposta = json.decode(r.body);
+      } catch (e) {
+        if (fail == false) {
+          gnpTime = new Timer(const Duration(seconds: 1), gnp);
+        }
+        return;
+      }
       var i;
       if (resposta["resposta"] != "error") {
         if (resposta["resposta"].length > 0) {
@@ -215,7 +231,7 @@ class _HomePageVupy extends State<HomePageVupy>
           }
           if (i + 1 >= resposta["resposta"].length) {
             if (fail == false) {
-              gnpTime = new Timer(const Duration(seconds: 2), gnp);
+              gnpTime = new Timer(const Duration(seconds: 1), gnp);
             }
           }
           if (this.mounted) {
@@ -223,7 +239,7 @@ class _HomePageVupy extends State<HomePageVupy>
           }
         } else {
           if (fail == false) {
-            gnpTime = new Timer(const Duration(seconds: 2), gnp);
+            gnpTime = new Timer(const Duration(seconds: 1), gnp);
           }
         }
       }
@@ -343,20 +359,8 @@ class _HomePageVupy extends State<HomePageVupy>
   void initState() {
     focusPubl.addListener(changeFocusPubl);
     startChatPub();
-    print("caller end");
-    gnpTime = new Timer(const Duration(seconds: 2), gnp);
+    gnpTime = new Timer(const Duration(seconds: 1), gnp);
     super.initState();
-    animationController = AnimationController(
-      // vsync: this,
-      vsync: this,
-      duration: Duration(seconds: 5),
-    )..addListener(() => setState(() {}));
-    animation = Tween<double>(
-      begin: 50.0,
-      end: 120.0,
-    ).animate(animationController);
-
-    animationController.forward();
   }
 
   Future<bool> will() async {
@@ -411,7 +415,7 @@ class _HomePageVupy extends State<HomePageVupy>
                   margin: EdgeInsets.only(left: 5, top: 5),
                   child: Row(
                     children: <Widget>[
-                      talks[6] != ""
+                      talks[7] != ""
                           ? Container(
                               width: 40,
                               height: 40,
@@ -420,7 +424,7 @@ class _HomePageVupy extends State<HomePageVupy>
                                   border: Border.all(color: Color(0x01000001)),
                                   borderRadius: BorderRadius.circular(100),
                                   image: DecorationImage(
-                                      image: NetworkImage(url + talks[6]),
+                                      image: NetworkImage(url + talks[7]),
                                       fit: BoxFit.cover)),
                             )
                           : Container(
@@ -435,7 +439,7 @@ class _HomePageVupy extends State<HomePageVupy>
                                       fit: BoxFit.cover)),
                             ),
                       Text(
-                        talks[5],
+                        talks[3],
                         style: TextStyle(color: syntaxdiffer),
                       ),
                     ],
@@ -505,30 +509,38 @@ class _HomePageVupy extends State<HomePageVupy>
             child: Container(
               margin: const EdgeInsets.only(left: 45.0),
               child: Text(
-                talks[4],
+                talks[5],
                 style: TextStyle(color: syntaxdiffer),
               ),
             ),
           ),
-          Divider(color: Color(0x00FFFFFF)),
-          talks[9] != "None"
-              ? Container(
-                  margin: EdgeInsets.only(left: 45),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      talks[9],
-                      style: TextStyle(color: syntaxdiffer),
-                    ),
-                  ))
-              : Container(),
+          Divider(color: Color(0x01000002)),
+
+          talks[6] != '' ?
+  
+            MaterialButton(
+              child: Row(
+                children: <Widget>[
+                  Icon(IconData(0xe90e, fontFamily: 'icomoon')),
+                  talks[9] == null ? Text(talks[7]) : Text(" " + talks[9])
+                ],
+              ),
+              onPressed: (){
+                downloadfilevupy(talks[6], talks[9], context);
+              },
+            )
+          :
+            Container(),
+
+          Divider(color: Color(0x01000002)),
+
           Container(
             margin: const EdgeInsets.only(top: 8.0, left: 45, right: 10),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: talks[3] != ""
+              child: talks[4] != ""
                   ? Text(
-                      talks[3],
+                      talks[4],
                       style: TextStyle(color: syntaxdiffer),
                     )
                   : Container(),
@@ -539,7 +551,7 @@ class _HomePageVupy extends State<HomePageVupy>
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  talks[7] == 0
+                  talks[8] == 0
                       ? FlatButton.icon(
                           icon: Icon(
                             IconData(0xe97c, fontFamily: 'icomoon'),
@@ -551,7 +563,7 @@ class _HomePageVupy extends State<HomePageVupy>
                             style: TextStyle(color: syntaxdiffer),
                           ),
                           onPressed: () {
-                            talks[7] = 1;
+                            talks[8] = 1;
                             likeMe(index, talks[0]);
                           },
                         )
@@ -566,7 +578,7 @@ class _HomePageVupy extends State<HomePageVupy>
                             style: TextStyle(color: syntaxdiffer),
                           ),
                           onPressed: () {
-                            talks[7] = 0;
+                            talks[8] = 0;
                             likeMe(index, talks[0]);
                           },
                         ),
@@ -586,10 +598,10 @@ class _HomePageVupy extends State<HomePageVupy>
                           MaterialPageRoute(
                             builder: (context) => Comments(
                               id: talks[0],
-                              name: talks[5],
+                              name: talks[3],
                               image: talks[6],
                               myname: name,
-                              text: talks[3],
+                              text: talks[4],
                               returnPage: "/bottom",
                               btn: vupycolor,
                               differBtn: differBtn,

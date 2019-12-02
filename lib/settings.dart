@@ -147,9 +147,7 @@ class _Settings extends State<Settings> {
       
     prefs.setStringList(
         "colorbtn", [btncp.red.toString(), btncp.green.toString(), btncp.blue.toString()]);
-
-
-    print(request.fields);
+        
     var response = await request.send();
       if (response.statusCode == 200) {
         if (this.mounted) {

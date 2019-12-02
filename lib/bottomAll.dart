@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
   Future styles () async {
     var prefs = await SharedPreferences.getInstance();
+
     var color = prefs.getStringList("colorbtn") ?? ["231", "0", "42", "1"];
 
     color = color.toList();
@@ -66,13 +67,11 @@ class _MyHomePageState extends State<MyHomePage>{
     jsona['user'] = prefs.getInt("userid") ?? 0;
     jsona['api'] = prefs.getString("api") ?? '';
 
-    print(jsona);
-
     var r = await http.post(Uri.encodeFull(url + '/workserver/gstt/'),
           body: json.encode(jsona));
     var resposta = json.decode(r.body);
 
-    onlinecolors(resposta);
+    await onlinecolors(resposta);
   }
 
   Future onlinecolors(var resposta) async {
@@ -92,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage>{
           differ = response[1];
           colorB = response[2];
           differBtn = response[3];
+          bodycolor = response[5];
           if (response[4] == 1) {
             syntax = Color(0xff282828);
             syntaxdiffer = Color(0xffffffff);
@@ -112,14 +112,13 @@ class _MyHomePageState extends State<MyHomePage>{
   Future gets() async {
     await styles();
     inTransition = 1;
-    _pageCon.animateToPage(widget.page,
-        duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+    print("sa");
+    // _pageCon.animateToPage(widget.page,
+    //     duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
 
     Timer(Duration(milliseconds: 500), () {
       inTransition = 0;
     });
-    
-    
   }
 
   @override
@@ -151,11 +150,11 @@ class _MyHomePageState extends State<MyHomePage>{
     return _bucket.readState(context, identifier: ValueKey(keygem));
   }
 
-  void changePage(int index) {
+  Future changePage(int index) async {
     inTransition = 1;
     if (this.mounted) {
+      await styles();
       setState(() {
-        styles();
         if (index == 0 && _selectedIndex != index) {
           homes.ungnp(dark, nav, colorB);
         }
@@ -165,7 +164,6 @@ class _MyHomePageState extends State<MyHomePage>{
           }
           if (_selectedIndex != index) {
             homes.stopgnp();
-            // homes.close()
           }
         }
         _selectedIndex = index;
@@ -179,10 +177,10 @@ class _MyHomePageState extends State<MyHomePage>{
     // inTransition = 0;
   }
 
-  void changePageView(int index) {
+  void changePageView(int index) async {
     if (this.mounted) {
+      await styles();
       setState(() {
-        styles();
         if (index == 0) {
           homes.ungnp(dark, nav, colorB);
         }

@@ -60,7 +60,7 @@ class _Comments extends State<Comments> {
 
   FocusNode focusComm = FocusNode();
 
-  int id, myId;
+  int id, myId, dark = 0;
 
   List talks = [];
   List duoemojis = [];
@@ -73,8 +73,14 @@ class _Comments extends State<Comments> {
 
   void startComm() async {
     var prefs = await SharedPreferences.getInstance();
+    if (this.mounted) {
+      setState(() {
+        dark = prefs.getInt("dark") ?? 0;
+      });
+    }
     myId = prefs.getInt('userid') ?? 0;
     api = prefs.getString("api") ?? '';
+    
 
     var jsona = {};
     jsona['id'] = id;
@@ -90,7 +96,9 @@ class _Comments extends State<Comments> {
     duoemojis =
         json.decode(await rootBundle.loadString('assets/json/finish.json'));
     if (this.mounted) {
-      setState(() {});
+      setState(() {
+        dark = prefs.getInt("dark") ?? 0;
+      });
     }
   }
 
@@ -205,6 +213,7 @@ class _Comments extends State<Comments> {
     differNav = widget.differNav;
     nav = widget.nav;
     focusComm.addListener(changeFocus);
+
     startComm();
     super.initState();
   }
@@ -240,6 +249,7 @@ class _Comments extends State<Comments> {
                 delegate: SliverChildListDelegate(
                   [
                     Container(
+                      color: dark == 0 ? Colors.white : Color(0xff1a1a1a),
                       child: Column(
                         children: <Widget>[
                           Divider(

@@ -1,26 +1,23 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:vupy/widgets/emojis.dart';
+import 'package:vupy/widgets/url.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:vupy/widgets/emojis.dart';
-
-import 'dart:convert';
-
-import 'package:vupy/widgets/url.dart';
 
 import 'bottomAll.dart';
 
 final TextEditingController publ = TextEditingController();
 
-class PrivateChatVupy extends StatefulWidget {
-  PrivateChatVupy(
+class GroupChat extends StatefulWidget {
+  GroupChat(
       {Key key,
       this.id,
       this.name,
@@ -44,7 +41,7 @@ class PrivateChatVupy extends StatefulWidget {
   final Color syntaxdiffer;
 
   @override
-  State createState() => _PrivateChatVupy();
+  State createState() => _GroupChatState();
 }
 
 class Emojis extends EmojisData {
@@ -56,66 +53,72 @@ class Emojis extends EmojisData {
   }
 }
 
-class _PrivateChatVupy extends State<PrivateChatVupy> {
-  var gnpTime, fail = 0;
-
-  int id, myId, ids;
-
-  String name, myname, image, api, url = URL().getUrl(), filter;
+class _GroupChatState extends State<GroupChat> {
+  var gnpTime;
+  String url = URL().getUrl();
   String style = "https://vupytcc.pythonanywhere.com/static/img/user.png";
+  String myname;
+  String api;
 
-  File filec;
-
-  List<File> file = [];
+  int myid, lid, fail = 0;
+  
   List talks = [];
   List imageF = [];
   List duoemojis = [];
-
-  Color vupycolor;
-  Color differBtn;
-  Color nav;
-  Color differNav;
+  List<File> file = [];
 
   bool _visible = false;
 
+  Color vupycolor;
   FocusNode focusPubl = new FocusNode();
 
-  void ftCamera() async {
-    filec = await ImagePicker.pickImage(source: ImageSource.gallery);
-    file.add(filec);
-    imageF.add(filec.path);
+  Future gets() async {
+    vupycolor = widget.btn;
+    var prefs = await SharedPreferences.getInstance();
+
+    if (widget.image != '') {
+      style = url + "/media" + widget.image;
+    }
+    else{
+      style = "https://vupytcc.pythonanywhere.com/static/img/user.png";
+    }
+
+    myid = prefs.getInt("userid") ?? 0;
+    api = prefs.getString("api") ?? '';
+
+    var jsona = {"user": myid, "api": api, "id": widget.id};
+    
+    var r = await http.post(Uri.encodeFull(url + "/workserver/getGroupTalks/"),
+        body: json.encode(jsona));
+    var resposta = json.decode(r.body);
+
+    talks.addAll(resposta['respostaT']);
+    myname = resposta['name'];
+    lid = resposta['id'];
+    duoemojis =
+        json.decode(await rootBundle.loadString('assets/json/finish.json'));
+    gng();
     if (this.mounted) {
       setState(() {});
     }
   }
 
-  void ftGaleria() async {
-    filec = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    file.add(filec);
-    // imageF = file.path;
-    imageF.add(filec.path);
-    if (this.mounted) {
-      setState(() {});
-    }
-  }
-
-  void gnc() async {
+  Future gng() async {
     var jsona = {};
-    if (myId != null || ids != null) {
-      jsona["user"] = myId;
-      jsona["id"] = ids;
+    if (myid != null || widget.id != null) {
+      jsona["user"] = myid;
+      jsona["grupo"] = widget.id;
       jsona["api"] = api;
-      jsona['userfr'] = id;
+      jsona['id'] = lid;
 
-      var r = await http.post(Uri.encodeFull(url + "/workserver/gnc/"),
+      var r = await http.post(Uri.encodeFull(url + "/workserver/gng/"),
           body: json.encode(jsona));
       var resposta;
       try {
         resposta = json.decode(r.body);
       } catch (e) {
         if (fail == 0) {
-          gnpTime = new Timer(const Duration(seconds: 1), gnc);
+          gnpTime = new Timer(const Duration(seconds: 1), gng);
         }
         return;
       }
@@ -123,7 +126,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
       if (resposta["resposta"] != "error") {
         if (resposta["resposta"].length > 0) {
           for (i = 0; i < resposta["resposta"].length; i++) {
-            ids = resposta["resposta"][i][0];
+            lid = resposta["resposta"][i][0];
             talks.insert(0, resposta["resposta"][i]);
             if (this.mounted) {
               setState(() {});
@@ -131,26 +134,26 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
           }
           if (i + 1 >= resposta["resposta"].length) {
             if (fail == 0) {
-              gnpTime = new Timer(const Duration(seconds: 1), gnc);
+              gnpTime = new Timer(const Duration(seconds: 1), gng);
             }
           }
         } else {
           if (fail == 0) {
-            gnpTime = new Timer(const Duration(seconds: 1), gnc);
+            gnpTime = new Timer(const Duration(seconds: 1), gng);
           }
         }
       }
     }
   }
 
-  void portToprivate() async {
+  Future portToprivate() async {
     if (imageF.length > 0 || publ.text != '') {
-      var uri = Uri.parse(url + "/workserver/postprivatechat/");
+      var uri = Uri.parse(url + "/workserver/groupchat/");
       var request = new http.MultipartRequest("POST", uri);
-      request.fields['name1'] = myname;
+      request.fields['name'] = myname;
       request.fields['api'] = api;
-      request.fields['user1'] = myId.toString();
-      request.fields['user2'] = id.toString();
+      request.fields['user'] = myid.toString();
+      request.fields['group'] = widget.id.toString();
 
       if (publ.text != "") {
         request.fields['msg'] = publ.text;
@@ -176,36 +179,8 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
     }
   }
 
-  void getP() async {
-    var prefs = await SharedPreferences.getInstance();
-    myId = prefs.getInt('userid') ?? 0;
-    api = prefs.getString("api") ?? '';
-    var jsona = {};
-    jsona["user"] = myId;
-    jsona["api"] = api;
-    jsona["id"] = id;
-    var r = await http.post(
-        Uri.encodeFull(url + "/workserver/getPrivateTalks/"),
-        body: json.encode(jsona));
-    var resposta = json.decode(r.body);
-    ids = resposta['id'];
-    myname = resposta['name'];
-    if (resposta['style'] != "") {
-      style = url + "/media/" + resposta['style'];
-    }
-    talks.addAll(resposta['respostaT']);
-    duoemojis =
-        json.decode(await rootBundle.loadString('assets/json/finish.json'));
-
-    if (this.mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
-    gnpTime = null;
-    fail = 1;
     super.dispose();
   }
 
@@ -220,17 +195,10 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
 
   @override
   void initState() {
-    id = widget.id;
-    name = widget.name;
-    image = widget.image;
-    vupycolor = widget.btn;
-    differBtn = widget.differBtn;
-    differNav = widget.differNav;
-    nav = widget.nav;
-    focusPubl.addListener(changeFocusPubl);
-    getP();
-    gnpTime = new Timer(const Duration(seconds: 1), gnc);
     super.initState();
+    focusPubl.addListener(changeFocusPubl);
+
+    gets();
   }
 
   Future<bool> will() {
@@ -247,9 +215,12 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
   @override
   Widget build(BuildContext context) {
     Emojis emox = new Emojis(MediaQuery.of(context).size.width, duoemojis);
+
     return Scaffold(
+      backgroundColor: widget.syntax,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: widget.nav,
         title: Row(
           children: <Widget>[
             Material(
@@ -259,8 +230,6 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(50),
                 onTap: () async {
-                  await gnpTime.cancel();
-                  fail = 1;
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -271,7 +240,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                 },
                 child: Row(
                   children: <Widget>[
-                    Icon(IconData(0xe913, fontFamily: 'icomoon'), color: differNav,),
+                    Icon(IconData(0xe913, fontFamily: 'icomoon'), color: widget.differNav,),
                     Container(
                       width: 35,
                       height: 35,
@@ -295,16 +264,14 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
             Container(
               margin: EdgeInsets.only(left: 12),
               child: Text(
-              name,
-              style: TextStyle(color: differNav),
-            ),
+                widget.name,
+                style: TextStyle(color: widget.differNav),
+              ),
             )
+            
           ],
         ),
-        backgroundColor: nav,
-        centerTitle: true,
       ),
-      backgroundColor: widget.syntax,
       body: SingleChildScrollView(
         child: Container(
           child: Column(
@@ -313,8 +280,6 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                 children: <Widget>[
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    // padding: EdgeInsets.symmetric(horizontal: 6),
-                    // height: MediaQuery.of(context).size.height * 0.7829,
                     height: imageF.length > 0
                         ? _visible == true
                             ? MediaQuery.of(context).size.height - 500
@@ -330,29 +295,23 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return Container(
-                                  padding: talks[index][2] == id
-                                      ? EdgeInsets.only(
-                                          left: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.32)
-                                      : EdgeInsets.only(
-                                          right: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.32),
-                                  margin: const EdgeInsets.only(
-                                      top: 10.0, left: 5.0, right: 5.0),
+                                  padding: talks[index][1] == myid
+                                      ? 
+                                        EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.32)
+                                      : 
+                                        EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.32),
+                                  margin: const EdgeInsets.only(top: 10.0, left: 5.0, right: 5.0),
                                   child: Column(
                                     children: <Widget>[
                                       Row(
-                                        mainAxisAlignment: talks[index][2] == id
-                                            ? MainAxisAlignment.end
-                                            : MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            talks[index][1] == myid
+                                                ? MainAxisAlignment.end
+                                                : MainAxisAlignment.start,
                                         children: <Widget>[
                                           Container(
                                               decoration: new BoxDecoration(
-                                                color: talks[index][2] == id
+                                                color: talks[index][1] == myid
                                                     ? Color(0Xff347cd5)
                                                     : widget.syntax ==
                                                             Color(0xff282828)
@@ -374,58 +333,54 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                   )
                                                 ],
                                               ),
+
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   talks[index][3] != ""
-                                                      ? Image.network(
-                                                          url + talks[index][3],
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.6,
+                                                    ? 
+                                                      Image.network(
+                                                        url + talks[index][3],
+                                                        width: MediaQuery.of(context).size.width * 0.6,
                                                         )
-                                                      : Container(),
-                                                  talks[index][4] != ""
-                                                      ? Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  left: 6,
-                                                                  bottom: 6,
-                                                                  right: 6,
-                                                                  top: 8),
-                                                          constraints: BoxConstraints(
-                                                              maxWidth: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width *
-                                                                  0.59),
+                                                    : Container(),
+                                                  talks[index][1] != myid ?
+                                                    Container(
+                                                      padding: EdgeInsets.only(left: 5, top: 5),
+                                                      child: Text(talks[index][5], style: TextStyle(color: widget.syntax == Color(
+                                                        0xff282828
+                                                      ) ? Colors.grey : Colors.black),),
+                                                      
+                                                    )
+                                                  :
+                                                    Container(),
+                                                  talks[index][2] != ""
+                                                    ? 
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                          left: 6,
+                                                          bottom: 6,
+                                                          right: 6,
+                                                          top: 2
+                                                        ),
+                                                        constraints: BoxConstraints(
+                                                          maxWidth: MediaQuery.of(context).size.width * 0.59),
                                                           child: Text(
-                                                            talks[index][4],
+                                                            talks[index][2],
                                                             style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontFamily:
-                                                                    "emoji",
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                height: 1.4,
-                                                                color: talks[index]
-                                                                            [
-                                                                            2] ==
-                                                                        id
-                                                                    ? Colors
-                                                                        .white
-                                                                    : widget.syntax ==
-                                                                            Color(
-                                                                                0xff282828)
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .black),
+                                                              fontSize: 16,
+                                                              fontFamily:
+                                                                "emoji",
+                                                              fontWeight: FontWeight.w400,
+                                                              height: 1.4,
+                                                              color: talks[index][1] == myid
+                                                                ? Colors.white
+                                                                : widget.syntax == Color(0xff282828)
+                                                                  ? Colors.white
+                                                                  : Colors.black
+                                                                ),
                                                           ),
                                                         )
                                                       : Container(),
@@ -434,30 +389,21 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                                         left: 6,
                                                         bottom: 6,
                                                         right: 6,
-                                                        top: 8),
+                                                        top: 2),
                                                     child: Align(
-                                                      alignment: talks[index]
-                                                                  [2] ==
-                                                              id
-                                                          ? Alignment.centerLeft
-                                                          : Alignment
-                                                              .centerRight,
+                                                      alignment: talks[index][1] == myid
+                                                        ? Alignment.centerLeft
+                                                        : Alignment.centerRight,
                                                       child: Text(
-                                                        talks[index][5],
+                                                        talks[index][4],
                                                         style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w100,
+                                                          fontWeight: FontWeight.w100,
                                                           fontSize: 13,
-                                                          color: talks[index]
-                                                                      [2] ==
-                                                                  id
+                                                          color: talks[index][2] == myid
                                                               ? Colors.white
-                                                              : widget.syntax ==
-                                                                      Color(
-                                                                          0xff282828)
-                                                                  ? Colors.white
-                                                                  : Colors
-                                                                      .black,
+                                                              : widget.syntax == Color(0xff282828)
+                                                                ? Colors.white
+                                                                : Colors.black,
                                                         ),
                                                       ),
                                                     ),
@@ -573,7 +519,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                         padding: new EdgeInsets.all(0.0),
                         color: vupycolor,
                         icon: Icon(IconData(0xe9dc, fontFamily: "icomoon"),
-                            size: 16.0, color: differBtn),
+                            size: 16.0, color: widget.differBtn),
                         onPressed: () {
                           _visible = !_visible;
                           if (_visible) {
@@ -630,7 +576,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                         padding: new EdgeInsets.all(0.0),
                         color: vupycolor,
                         icon: Icon(IconData(0xe92b, fontFamily: "icomoon"),
-                            size: 16.0, color: differBtn),
+                            size: 16.0, color: widget.differBtn),
                         onPressed: () {
                           showDialog(
                             context: context,
@@ -644,7 +590,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                       ButtonTheme(
                                           child: RaisedButton(
                                         onPressed: () {
-                                          ftGaleria();
+                                          // ftGaleria();
                                           Navigator.pop(context);
                                         },
                                         child: Text("Galeria",
@@ -655,11 +601,12 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                                       ButtonTheme(
                                           child: RaisedButton(
                                         onPressed: () {
-                                          ftCamera();
+                                          // ftCamera();
                                           Navigator.pop(context);
                                         },
                                         child: Text("Camera",
-                                            style: TextStyle(color: differBtn)),
+                                            style: TextStyle(
+                                                color: widget.differBtn)),
                                         color: vupycolor,
                                       )),
                                     ],
@@ -684,7 +631,7 @@ class _PrivateChatVupy extends State<PrivateChatVupy> {
                       child: new IconButton(
                         padding: new EdgeInsets.all(0.0),
                         icon: Icon(IconData(0xe9cb, fontFamily: "icomoon"),
-                            size: 16.0, color: differBtn),
+                            size: 16.0, color: widget.differBtn),
                         onPressed: () {
                           portToprivate();
                         },

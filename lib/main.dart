@@ -12,10 +12,13 @@ import 'perfilfts.dart';
 import 'privateChat.dart';
 import 'comments.dart';
 import 'bottomAll.dart';
+import 'groupchat.dart';
 
 const vupycolor = const Color(0xFFE7002B);
 const white = const Color(0xFFFFFFFF);
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+
 
 void main() => runApp(new MaterialApp(
       theme: ThemeData(
@@ -48,6 +51,10 @@ Route routes(RouteSettings settings) {
     case '/privatechat':
       return PageTransition(
           child: PrivateChatVupy(), type: PageTransitionType.downToUp);
+
+    case '/groupchat':
+      return PageTransition(
+          child: GroupChat(), type: PageTransitionType.downToUp);
 
     case '/comments':
       return PageTransition(
@@ -97,8 +104,8 @@ class _MyApp extends State<MyApp> {
         Navigator.pushReplacementNamed(context, "/bottom");
       }
     }
-
     checkuser();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -185,5 +192,6 @@ class _MyApp extends State<MyApp> {
         ],
       ),
     );
+  
   }
 }

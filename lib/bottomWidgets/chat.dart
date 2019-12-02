@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:vupy/groupchat.dart';
 import 'package:vupy/widgets/getColors.dart';
 import 'package:vupy/widgets/url.dart';
 
@@ -19,10 +20,9 @@ class ChatVupy extends StatefulWidget {
 
   @override
   State createState() => chat;
-
 }
 
-class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
+class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin {
   int myId, ids, show = 0, experince = 0;
   String api, url = URL().getUrl();
   List friends = [];
@@ -35,31 +35,38 @@ class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
   bool dark;
 
   Future styles(darkx, nav, btn) async {
-    
     if (experince == 0) {
       experince = 1;
       return;
     }
-    dark = darkx;
-    trueColor = nav;
-    vupycolor = btn;
-    show = 1;
 
-    if (trueColor.computeLuminance() > 0.673) {
-      differ = Colors.black;
-    }
-    if (vupycolor.computeLuminance() > 0.673) {
-      differBtn = Colors.black;
-    }
+    if (this.mounted) {
+      setState(() {
+        dark = darkx;
+        trueColor = nav;
+        vupycolor = btn;
+        show = 1;
 
-    if (dark == true) {
-      syntax = Color(0xff282828);
-      syntaxdiffer = Color(0xffffffff);
-    } else {
-      syntax = Colors.white;
-      syntaxdiffer = Colors.black;
-    }
+        if (trueColor.computeLuminance() > 0.673) {
+          differ = Colors.black;
+        } else {
+          differ = Colors.white;
+        }
+        if (vupycolor.computeLuminance() > 0.673) {
+          differBtn = Colors.black;
+        } else {
+          differBtn = Colors.white;
+        }
 
+        if (dark == true) {
+          syntax = Color(0xff282828);
+          syntaxdiffer = Color(0xffffffff);
+        } else {
+          syntax = Colors.white;
+          syntaxdiffer = Colors.black;
+        }
+      });
+    }
   }
 
   @override
@@ -160,7 +167,6 @@ class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
 
   @override
   Widget build(BuildContext context) {
-
     super.build(context);
 
     return Stack(
@@ -226,42 +232,66 @@ class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
                     color: syntax,
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: NetworkImage(url + friends[index][2]),
+                        backgroundImage: friends[index][2]
+                                    .contains("/media/") ||
+                                friends[index][2].contains("/static/")
+                            ? NetworkImage(url + friends[index][2])
+                            : friends[index][2] != ''
+                                ? NetworkImage(
+                                    url + "/media" + friends[index][2])
+                                : NetworkImage(url + "/static/img/user.png"),
                         backgroundColor: syntax,
                       ),
-                      trailing: Container(
-                        decoration: BoxDecoration(
-                            // color: vupycolor,
-                            border: Border.all(color: Color(0x01000001)),
-                            borderRadius: BorderRadius.circular(200)),
-                        child: IconButton(
-                          color: syntax == Color(0xff282828)
-                              ? syntaxdiffer
-                              : Colors.blueGrey,
-                          icon: Icon(
-                            IconData(0xea00, fontFamily: 'icomoon'),
-                            size: 26,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OtherPerfil(
-                                    idFr: friends[index][0],
-                                  ),
-                                ));
-                          },
-                        ),
-                      ),
+                      trailing: friends[index][3] == -1
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  // color: vupycolor,
+                                  border: Border.all(color: Color(0x01000001)),
+                                  borderRadius: BorderRadius.circular(200)),
+                              child: IconButton(
+                                color: syntax == Color(0xff282828)
+                                    ? syntaxdiffer
+                                    : Colors.blueGrey,
+                                icon: Icon(
+                                  IconData(0xea00, fontFamily: 'icomoon'),
+                                  size: 26,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OtherPerfil(
+                                          idFr: friends[index][0],
+                                        ),
+                                      ));
+                                },
+                              ),
+                            )
+                          : Text(""),
                       title: Text(
                         friends[index][1],
                         style: TextStyle(color: syntaxdiffer),
                       ),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PrivateChatVupy(
+                        friends[index][3] == -1
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PrivateChatVupy(
+                                id: friends[index][0],
+                                name: friends[index][1],
+                                image: friends[index][2],
+                                nav: trueColor,
+                                differNav: differ,
+                                differBtn: differBtn,
+                                btn: vupycolor,
+                                syntax: syntax,
+                                syntaxdiffer: syntaxdiffer,
+                              ),
+                            ),
+                          )
+                        : Navigator.push(context, MaterialPageRoute(
+                            builder: (context) => GroupChat(
                               id: friends[index][0],
                               name: friends[index][1],
                               image: friends[index][2],
@@ -271,8 +301,8 @@ class _ChatVupy extends State<ChatVupy> with AutomaticKeepAliveClientMixin{
                               btn: vupycolor,
                               syntax: syntax,
                               syntaxdiffer: syntaxdiffer,
-                            ),
-                          ),
+                            )
+                          )
                         );
                       },
                     ),

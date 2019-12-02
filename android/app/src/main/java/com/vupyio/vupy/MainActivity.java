@@ -1,4 +1,4 @@
-package com.example.vupy;
+package com.vupyio.vupy;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
